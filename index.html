@@ -10,23 +10,18 @@
     <style>
         .prime-cell { background-color: #dcfce7; color: #166534; font-weight: bold; }
         .composite-cell { background-color: #fee2e2; color: #991b1b; }
-        .heegner-highlight { background-color: #f0f9ff; border-left: 4px solid #0ea5e9; }
         /* Smooth scrolling for the table container */
         .table-scroll {
             scrollbar-width: thin;
             scrollbar-color: #cbd5e1 #f8fafc;
         }
-        /* Fix for sticky column alignment */
-        .sticky-col-1 { position: sticky; left: 0; z-index: 30; }
-        .sticky-col-2 { position: sticky; left: 100px; z-index: 30; }
     </style>
 </head>
 <body class="bg-slate-50 min-height-screen p-4 md:p-8">
     <div class="max-w-7xl mx-auto">
         <header class="mb-8 text-center">
             <h1 class="text-3xl font-bold text-slate-800 mb-2">Heegner Number Matrix Explorer</h1>
-            <p class="text-slate-600">Investigating the Prime-Generating Polynomial: \(f(n) = n^2 - n + \frac{1+D}{4}\)
-            , LeeMcCullochJames@</p>
+            <p class="text-slate-600">Investigating the Prime-Generating Polynomial: \(f(n) = n^2 - n + C\), where \(C = \frac{1+D}{4}\)</p>
         </header>
 
         <!-- Controls -->
@@ -37,7 +32,8 @@
                 <span id="nValue" class="text-center font-mono text-blue-600 font-bold text-lg">45</span>
             </div>
             <div class="text-sm text-slate-500 max-w-md border-l pl-6 border-slate-200">
-                <p>Observe the "163" row: It produces a solid streak of primes until \(n=41\). </p>
+                <p>Formula: \(n^2 - n + \text{Constant}\)</p>
+                <p class="mt-1">Example (\(D=163\), \(n=1\)): \(1^2 - 1 + 41 = 41\)</p>
                 <div class="mt-2 flex gap-4">
                     <span><span class="inline-block w-3 h-3 bg-green-100 border border-green-300 mr-1"></span> Prime</span>
                     <span><span class="inline-block w-3 h-3 bg-red-100 border border-red-300 mr-1"></span> Composite</span>
@@ -60,26 +56,52 @@
         </div>
 
         <!-- Explanation Section -->
-        <div class="grid md:grid-cols-2 gap-8 mt-12">
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                <h2 class="text-xl font-bold text-slate-800 mb-4">The Mathematical Significance</h2>
-                <p class="text-slate-600 mb-4">
-                    A <strong>Heegner number</strong> is a positive square-free integer \(D\) such that the imaginary quadratic field \(\mathbb{Q}(\sqrt{-D})\) has class number 1. 
-                    This property is extremely rare; there are exactly nine: 
-                    <span class="font-mono bg-slate-100 px-1 rounded text-blue-700">1, 2, 3, 7, 11, 19, 43, 67, 163</span>.
-                </p>
-                <p class="text-slate-600">
-                    For \(D=163\), the constant \(\frac{1+163}{4} = 41\). 
-                    The resulting polynomial \(n^2 - n + 41\) is famous for producing primes for \(n=1\) up to \(n=40\). At \(n=41\), the formula becomes \(41^2 - 41 + 41 = 41^2 = 1681\), which is obviously composite.
-                </p>
+        <div class="grid md:grid-cols-3 gap-6 mt-12">
+            <!-- Col 1: Basics -->
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                <h2 class="text-lg font-bold text-slate-800 mb-3 border-b pb-2">Calculation Logic</h2>
+                <div class="text-slate-600 space-y-3 text-sm">
+                    <p>Each cell is: <code class="bg-slate-100 p-1 rounded text-blue-700">n² - n + C</code></p>
+                    <p>
+                        <strong>Row 163 (C=41):</strong>
+                        <ul class="list-disc ml-5 space-y-1">
+                            <li>\(n=1\): \(1-1+41 = 41\)</li>
+                            <li>\(n=40\): \(1600-40+41 = 1601\)</li>
+                            <li>\(n=41\): \(1681-41+41 = 41^2\)</li>
+                        </ul>
+                    </p>
+                    <p class="pt-2 italic border-t">
+                        <strong>Note on D=1, 2:</strong> These yield \(C=0.5\) and \(0.75\). Since \(C\) is not an integer, the polynomial never produces primes.
+                    </p>
+                </div>
             </div>
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                <h2 class="text-xl font-bold text-slate-800 mb-4">Observations</h2>
-                <ul class="space-y-3 text-slate-600">
-                    <li><strong class="text-slate-800">The "Break" Point:</strong> Slide the range to 50. Notice how row 163 turns <span class="text-red-600 font-bold">red</span> exactly at column 41.</li>
-                    <li><strong class="text-slate-800">Half-Integers:</strong> For \(D=1\) and \(D=2\), the constant is not an integer. These rows show the decimal results and are generally not prime-generating in this form.</li>
-                    <li><strong class="text-slate-800">Class Number 1:</strong> These numbers are the only ones that allow this specific type of prime-generating "perfection" due to the unique factorization in their associated rings of integers.</li>
-                </ul>
+
+            <!-- Col 2: Unique Factorization -->
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                <h2 class="text-lg font-bold text-slate-800 mb-3 border-b pb-2">Class Number 1</h2>
+                <div class="text-slate-600 space-y-3 text-sm">
+                    <p>
+                        In the associated rings of integers for these 9 numbers, <strong>Unique Factorization</strong> holds. This is a property of "Class Number 1" fields.
+                    </p>
+                    <p>
+                        This algebraic "perfection" ensures that the polynomial doesn't "break" (produce a composite number) until the most basic algebraic identity (\(n=C\)) forces it to.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Col 3: Counter-Example -->
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 border-l-4 border-l-red-400">
+                <h2 class="text-lg font-bold text-slate-800 mb-3 border-b pb-2">Non-Unique Counter-Example</h2>
+                <div class="text-slate-600 space-y-3 text-sm">
+                    <p>For \(D=5\) (not a Heegner number), the ring \(\mathbb{Z}[\sqrt{-5}]\) lacks unique factorization. Witness the number <strong>6</strong>:</p>
+                    <div class="bg-slate-50 p-2 rounded font-mono text-center">
+                        \(6 = 2 \times 3\) <br>
+                        \(6 = (1 + \sqrt{-5})(1 - \sqrt{-5})\)
+                    </div>
+                    <p>
+                        Since \(2, 3, (1 \pm \sqrt{-5})\) are all irreducible but distinct, 6 has two different "prime" factorizations. This failure of symmetry is why non-Heegner polynomials fail to generate long prime streaks.
+                    </p>
+                </div>
             </div>
         </div>
     </div>
@@ -103,17 +125,14 @@
             const headerRow = document.getElementById('tableHeader');
             const tableBody = document.getElementById('tableBody');
 
-            // Using ASCII/Unicode for the fraction to ensure clean display without LaTeX errors
             const fractionHeader = "Const (1+D)/4";
 
-            // Build Header
             headerRow.innerHTML = `
                 <th class="p-4 border-r border-slate-200 sticky left-0 bg-slate-100 z-30 min-w-[100px]">Heegner \(D\)</th>
                 <th class="p-4 border-r border-slate-200 sticky left-[100px] bg-slate-100 z-30 min-w-[140px]">${fractionHeader}</th>
                 ${Array.from({length: maxN}, (_, i) => `<th class="p-2 text-center border-r border-slate-200 min-w-[60px]">\(n=${i+1}\)</th>`).join('')}
             `;
 
-            // Build Body
             tableBody.innerHTML = '';
             heegnerNumbers.forEach(d => {
                 const constant = (1 + d) / 4;
@@ -144,16 +163,14 @@
                 tableBody.appendChild(row);
             });
 
-            // Re-render LaTeX for the rest of the page
             if (window.MathJax) {
                 MathJax.typesetPromise();
             }
         }
 
         document.getElementById('nRange').addEventListener('input', updateTable);
-        
-        // Initial load
         window.onload = updateTable;
     </script>
 </body>
 </html>
+
