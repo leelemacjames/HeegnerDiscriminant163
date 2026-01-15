@@ -10,17 +10,46 @@
     <style>
         .prime-cell { background-color: #dcfce7; color: #166534; font-weight: bold; }
         .composite-cell { background-color: #fee2e2; color: #991b1b; }
-        /* Smooth scrolling for the table container */
         .table-scroll {
             scrollbar-width: thin;
             scrollbar-color: #cbd5e1 #f8fafc;
+        }
+        .ascii-tagline {
+            font-family: monospace;
+            white-space: pre;
+            line-height: 1.2;
+            color: #1e293b;
+        }
+        tr.collapsed { display: none; }
+        .toggle-btn {
+            transition: all 0.2s;
+        }
+        .toggle-btn:hover {
+            transform: translateY(-1px);
         }
     </style>
 </head>
 <body class="bg-slate-50 min-height-screen p-4 md:p-8">
     <div class="max-w-7xl mx-auto">
         <header class="mb-8 text-center">
-            <h1 class="text-3xl font-bold text-slate-800 mb-2">Heegner Number Matrix Explorer</h1>
+            <!-- Tagline Section -->
+            <div class="flex flex-col items-center justify-center mb-6">
+                <div class="ascii-tagline text-[10px] md:text-xs bg-slate-100 p-4 rounded-lg border border-slate-200 shadow-inner">
+  _    _                               _   _                      _               
+ | |  | |                             | \ | |                    | |              
+ | |__| | ___  ___  __ _ _ __   ___ _ _|  \| |_   _ _ __ ___ | |__   ___ _ __ ___ 
+ |  __  |/ _ \/ _ \/ _` | '_ \ / _ \ '__| . ` | | | | '_ ` _ \| '_ \ / _ \ '__/ __|
+ | |  | |  __/  __/ (_| | | | |  __/ |  | |\  | |_| | | | | | | |_) |  __/ |  \__ \
+ |_|  |_|\___|\___|\__, |_| |_|\___|_|  |_| \_|\__,_|_| |_| |_|_.__/ \___|_|  |___/
+                    __/ |                                                         
+                   |___/                                                          
+                </div>
+                <p class="mt-4 text-lg font-medium text-slate-700 max-w-2xl">
+                    The 9 Magic Numbers of Class Number 1: Where Algebra ensures Prime Perfection.
+                </p>
+            </div>
+            
+            <h1 class="text-3xl font-bold text-slate-800 mb-2">Matrix Explorer</h1>
             <p class="text-slate-600">Investigating the Prime-Generating Polynomial: \(f(n) = n^2 - n + C\), where \(C = \frac{1+D}{4}\)</p>
         </header>
 
@@ -31,9 +60,15 @@
                 <input type="range" id="nRange" min="5" max="50" value="45" class="w-64 accent-blue-600">
                 <span id="nValue" class="text-center font-mono text-blue-600 font-bold text-lg">45</span>
             </div>
+            <div class="flex flex-col items-center border-l px-6 border-slate-200">
+                <button id="toggleCollapsed" class="toggle-btn bg-slate-800 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-sm hover:bg-slate-700 mb-2">
+                    Show Non-Integer D (1, 2)
+                </button>
+                <span class="text-[10px] text-slate-400 uppercase tracking-wider">Spreadsheet Toggle</span>
+            </div>
             <div class="text-sm text-slate-500 max-w-md border-l pl-6 border-slate-200">
-                <p>Formula: \(n^2 - n + \text{Constant}\)</p>
-                <p class="mt-1">Example (\(D=163\), \(n=1\)): \(1^2 - 1 + 41 = 41\)</p>
+                <p>For \(D=163\), \(n^2 - n + 41\) produces primes for \(n = 1\) to \(40\).</p>
+                <p class="mt-1 text-xs text-blue-600 italic">Linked to Ramanujan's Constant.</p>
                 <div class="mt-2 flex gap-4">
                     <span><span class="inline-block w-3 h-3 bg-green-100 border border-green-300 mr-1"></span> Prime</span>
                     <span><span class="inline-block w-3 h-3 bg-red-100 border border-red-300 mr-1"></span> Composite</span>
@@ -57,34 +92,31 @@
 
         <!-- Explanation Section -->
         <div class="grid md:grid-cols-3 gap-6 mt-12">
-            <!-- Col 1: Basics -->
-            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
-                <h2 class="text-lg font-bold text-slate-800 mb-3 border-b pb-2">Calculation Logic</h2>
+            <!-- Col 1: Ramanujan -->
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 border-t-4 border-t-blue-500">
+                <h2 class="text-lg font-bold text-slate-800 mb-3 border-b pb-2">Ramanujan's Constant</h2>
                 <div class="text-slate-600 space-y-3 text-sm">
-                    <p>Each cell is: <code class="bg-slate-100 p-1 rounded text-blue-700">n² - n + C</code></p>
                     <p>
-                        <strong>Row 163 (C=41):</strong>
-                        <ul class="list-disc ml-5 space-y-1">
-                            <li>\(n=1\): \(1-1+41 = 41\)</li>
-                            <li>\(n=40\): \(1600-40+41 = 1601\)</li>
-                            <li>\(n=41\): \(1681-41+41 = 41^2\)</li>
-                        </ul>
+                        The number 163 isn't just a prime generator. It also produces the "Almost Integer":
                     </p>
-                    <p class="pt-2 italic border-t">
-                        <strong>Note on D=1, 2:</strong> These yield \(C=0.5\) and \(0.75\). Since \(C\) is not an integer, the polynomial never produces primes.
+                    <div class="bg-slate-50 p-2 rounded font-mono text-xs overflow-x-auto">
+                        \( e^{\pi\sqrt{163}} \approx 262537412640768743.99999999999925 \)
+                    </div>
+                    <p>
+                        This happens because \(D=163\) is the largest Heegner number. The "Class Number 1" property means there is only one way to factor numbers in this algebraic field, leading to this nearly perfect alignment.
                     </p>
                 </div>
             </div>
 
             <!-- Col 2: Unique Factorization -->
             <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
-                <h2 class="text-lg font-bold text-slate-800 mb-3 border-b pb-2">Class Number 1</h2>
+                <h2 class="text-lg font-bold text-slate-800 mb-3 border-b pb-2">Class Number 1 Perfection</h2>
                 <div class="text-slate-600 space-y-3 text-sm">
                     <p>
-                        In the associated rings of integers for these 9 numbers, <strong>Unique Factorization</strong> holds. This is a property of "Class Number 1" fields.
+                        The 9 Heegner numbers define fields where <strong>Unique Factorization</strong> holds. 
                     </p>
                     <p>
-                        This algebraic "perfection" ensures that the polynomial doesn't "break" (produce a composite number) until the most basic algebraic identity (\(n=C\)) forces it to.
+                        For \(D=163\), the polynomial \(n^2 - n + 41\) stays prime until \(n=41\). Because \(41^2 - 41 + 41 = 41^2\), column 41 is the first mathematical necessity for a composite value.
                     </p>
                 </div>
             </div>
@@ -99,7 +131,7 @@
                         \(6 = (1 + \sqrt{-5})(1 - \sqrt{-5})\)
                     </div>
                     <p>
-                        Since \(2, 3, (1 \pm \sqrt{-5})\) are all irreducible but distinct, 6 has two different "prime" factorizations. This failure of symmetry is why non-Heegner polynomials fail to generate long prime streaks.
+                        Since there are two distinct ways to factor the same number, the symmetry is broken. This is why polynomials for non-Heegner numbers hit composite values almost immediately.
                     </p>
                 </div>
             </div>
@@ -108,6 +140,7 @@
 
     <script>
         const heegnerNumbers = [1, 2, 3, 7, 11, 19, 43, 67, 163];
+        let showNonInteger = false;
         
         function isPrime(num) {
             if (num <= 1) return false;
@@ -136,8 +169,10 @@
             tableBody.innerHTML = '';
             heegnerNumbers.forEach(d => {
                 const constant = (1 + d) / 4;
+                const isNonIntegerD = (d === 1 || d === 2);
+                
                 const row = document.createElement('tr');
-                row.className = "border-b border-slate-100 hover:bg-slate-50 transition-colors group";
+                row.className = `border-b border-slate-100 hover:bg-slate-50 transition-colors group ${isNonIntegerD && !showNonInteger ? 'collapsed' : ''}`;
                 
                 let cellsHtml = `
                     <td class="p-4 font-bold text-slate-700 border-r border-slate-200 sticky left-0 bg-white group-hover:bg-slate-50 z-20">${d}</td>
@@ -168,9 +203,19 @@
             }
         }
 
+        document.getElementById('toggleCollapsed').addEventListener('click', () => {
+            showNonInteger = !showNonInteger;
+            const btn = document.getElementById('toggleCollapsed');
+            btn.textContent = showNonInteger ? 'Hide Non-Integer D' : 'Show Non-Integer D (1, 2)';
+            updateTable();
+        });
+
         document.getElementById('nRange').addEventListener('input', updateTable);
         window.onload = updateTable;
     </script>
 </body>
 </html>
+</body>
+</html>
+
 
