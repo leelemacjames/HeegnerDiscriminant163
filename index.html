@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Heegner Number & Prime Polynomial Explorer</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- MathJax for LaTeX Rendering -->
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <style>
         .prime-cell { background-color: #dcfce7; color: #166534; font-weight: bold; }
@@ -21,18 +20,15 @@
             color: #1e293b;
         }
         tr.collapsed { display: none; }
-        .toggle-btn {
-            transition: all 0.2s;
-        }
-        .toggle-btn:hover {
-            transform: translateY(-1px);
-        }
+        .toggle-btn { transition: all 0.2s; }
+        .toggle-btn:hover { transform: translateY(-1px); }
+        canvas { border-radius: 0.75rem; background: #0f172a; width: 100%; height: 300px; }
+        .math-block { background: #f1f5f9; padding: 1rem; border-radius: 0.5rem; font-family: serif; }
     </style>
 </head>
 <body class="bg-slate-50 min-height-screen p-4 md:p-8">
     <div class="max-w-7xl mx-auto">
         <header class="mb-8 text-center">
-            <!-- Tagline Section -->
             <div class="flex flex-col items-center justify-center mb-6">
                 <div class="ascii-tagline text-[10px] md:text-xs bg-slate-100 p-4 rounded-lg border border-slate-200 shadow-inner">
   _    _                               _   _                      _               
@@ -45,18 +41,15 @@
                    |___/                                                          
                 </div>
                 <p class="mt-4 text-lg font-medium text-slate-700 max-w-2xl">
-                    The 9 Magic Numbers of Class Number 1: Where Algebra ensures Prime Perfection. LeeMcCullochJames@
+                    The 9 Magic Numbers of Class Number 1: Where Algebra ensures Prime Perfection.LeeMcCullochJames@
                 </p>
             </div>
-            
-            <h1 class="text-3xl font-bold text-slate-800 mb-2">Matrix Explorer</h1>
-            <p class="text-slate-600">Investigating the Prime-Generating Polynomial: \(f(n) = n^2 - n + C\), where \(C = \frac{1+D}{4}\)</p>
         </header>
 
-        <!-- Controls -->
+        <!-- Matrix Controls -->
         <div class="bg-white p-6 rounded-xl shadow-sm mb-8 flex flex-wrap gap-6 items-center justify-center border border-slate-200">
             <div class="flex flex-col">
-                <label class="text-sm font-semibold text-slate-700 mb-1">Max \(n\) (Columns):</label>
+                <label class="text-sm font-semibold text-slate-700 mb-1">Max \(n\) (Integer Steps):</label>
                 <input type="range" id="nRange" min="5" max="50" value="45" class="w-64 accent-blue-600">
                 <span id="nValue" class="text-center font-mono text-blue-600 font-bold text-lg">45</span>
             </div>
@@ -64,75 +57,101 @@
                 <button id="toggleCollapsed" class="toggle-btn bg-slate-800 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-sm hover:bg-slate-700 mb-2">
                     Show Non-Integer D (1, 2)
                 </button>
-                <span class="text-[10px] text-slate-400 uppercase tracking-wider">Spreadsheet Toggle</span>
             </div>
-            <div class="text-sm text-slate-500 max-w-md border-l pl-6 border-slate-200">
-                <p>For \(D=163\), \(n^2 - n + 41\) produces primes for \(n = 1\) to \(40\).</p>
-                <p class="mt-1 text-xs text-blue-600 italic">Linked to Ramanujan's Constant.</p>
-                <div class="mt-2 flex gap-4">
-                    <span><span class="inline-block w-3 h-3 bg-green-100 border border-green-300 mr-1"></span> Prime</span>
-                    <span><span class="inline-block w-3 h-3 bg-red-100 border border-red-300 mr-1"></span> Composite</span>
-                </div>
+            <div class="text-sm text-slate-500 border-l pl-6 border-slate-200">
+                <p>Heegner Prime Generator: \( f(n) = n^2 - n + 41 \)</p>
+                <p class="text-xs text-blue-600 italic">For \( D=163 \), primes persist for \( n=1..40 \)</p>
             </div>
         </div>
 
-        <!-- Table Container -->
-        <div class="overflow-x-auto bg-white rounded-xl shadow-md border border-slate-200 table-scroll">
+        <!-- Table -->
+        <div class="overflow-x-auto bg-white rounded-xl shadow-md border border-slate-200 table-scroll mb-12">
             <table class="w-full text-sm text-left border-collapse">
-                <thead>
-                    <tr id="tableHeader" class="bg-slate-100 border-b border-slate-200">
-                        <!-- Populated by JS -->
-                    </tr>
-                </thead>
-                <tbody id="tableBody">
-                    <!-- Populated by JS -->
-                </tbody>
+                <thead><tr id="tableHeader" class="bg-slate-100 border-b border-slate-200"></tr></thead>
+                <tbody id="tableBody"></tbody>
             </table>
         </div>
 
-        <!-- Explanation Section -->
-        <div class="grid md:grid-cols-3 gap-6 mt-12">
-            <!-- Col 1: Ramanujan -->
-            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 border-t-4 border-t-blue-500">
+        <!-- Physics Lab -->
+        <div class="bg-white p-8 rounded-xl shadow-md border border-slate-200 mb-12">
+            <h2 class="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+                <span class="p-2 bg-blue-100 rounded-lg">⚙️</span>
+                The Heegner Oscillator & Standing Waves
+            </h2>
+
+            <div class="grid lg:grid-cols-2 gap-10">
+                <div class="space-y-6">
+                    <div class="math-block">
+                        <p class="font-bold text-blue-800 mb-2">Differential Equation (SHM):</p>
+                        \[ m \frac{d^2x}{dt^2} + kx = 0 \]
+                        <p class="mt-2 text-sm">Solution: \( x(t) = A \cos(\omega t) \)</p>
+                        <p class="text-sm">Angular Frequency: \( \omega = \sqrt{k/m} = 2\pi f \)</p>
+                        <p class="text-sm">Period: \( T = 1/f = 2\pi \sqrt{m/k} \)</p>
+                    </div>
+
+                    <div class="space-y-4 bg-slate-50 p-6 rounded-lg border border-slate-100">
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">Mass (\(m\)) [kg]: <span id="mDisp" class="text-blue-600">1.0</span></label>
+                            <input type="range" id="mSlider" min="0.2" max="4" step="0.1" value="1" class="w-full accent-blue-600">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">Stiffness (\(k\)) [N/m]: <span id="kDisp" class="text-emerald-600">41.0</span></label>
+                            <input type="range" id="kSlider" min="1" max="200" step="1" value="41" class="w-full accent-emerald-600">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 pt-4 border-t text-sm font-mono">
+                            <div>\(\omega\): <span id="omegaVal" class="font-bold">0</span></div>
+                            <div>\(f\): <span id="fVal" class="font-bold">0</span></div>
+                            <div>\(T\): <span id="tVal" class="font-bold">0</span></div>
+                            <div>\(k/m\): <span id="ratioVal" class="font-bold">0</span></div>
+                        </div>
+                        <button id="preset163" class="w-full bg-blue-600 text-white py-2 rounded font-bold hover:bg-blue-700 transition shadow-sm">
+                            Snap to Heegner \(D=163\) (\(k=41m\))
+                        </button>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <div class="relative">
+                        <canvas id="oscCanvas"></canvas>
+                        <div class="absolute top-4 left-4 bg-black/50 text-white p-2 rounded text-xs font-mono">
+                            SHM Vibration & Harmonic Primes
+                        </div>
+                    </div>
+                    <div class="p-4 bg-amber-50 rounded-lg border border-amber-100 text-xs text-amber-900">
+                        <strong>Pedagogical Insight:</strong> The standing wave visualization shows the "Heegner String". 
+                        The number of nodes corresponds to \(n\). Stable green waves indicate a Prime outcome (Harmonic symmetry). 
+                        Red jagged waves indicate a Composite outcome (Broken symmetry).
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footnotes -->
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 border-t-4 border-t-indigo-500">
                 <h2 class="text-lg font-bold text-slate-800 mb-3 border-b pb-2">Ramanujan's Constant</h2>
                 <div class="text-slate-600 space-y-3 text-sm">
-                    <p>
-                        The number 163 isn't just a prime generator. It also produces the "Almost Integer":
-                    </p>
-                    <div class="bg-slate-50 p-2 rounded font-mono text-xs overflow-x-auto">
-                        \( e^{\pi\sqrt{163}} \approx 262537412640768743.99999999999925 \)
-                    </div>
-                    <p>
-                        This happens because \(D=163\) is the largest Heegner number. The "Class Number 1" property means there is only one way to factor numbers in this algebraic field, leading to this nearly perfect alignment.
-                    </p>
+                    <p>\( e^{\pi\sqrt{163}} \approx 262537412640768743.999... \)</p>
+                    <p>When \(D=163\), the field has <strong>Class Number 1</strong>, ensuring nearly perfect integer alignment.</p>
                 </div>
             </div>
-
-            <!-- Col 2: Unique Factorization -->
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 border-t-4 border-t-red-500">
+                <h2 class="text-lg font-bold text-slate-800 mb-3 border-b pb-2">Broken Symmetry</h2>
+                <div class="text-slate-600 space-y-3 text-sm">
+                    <p>For non-Heegner numbers like \(D=5\), unique factorization fails: \(6 = 2 \cdot 3 = (1+\sqrt{-5})(1-\sqrt{-5})\).</p>
+                </div>
+            </div>
             <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
-                <h2 class="text-lg font-bold text-slate-800 mb-3 border-b pb-2">Class Number 1 Perfection</h2>
-                <div class="text-slate-600 space-y-3 text-sm">
-                    <p>
-                        The 9 Heegner numbers define fields where <strong>Unique Factorization</strong> holds. 
-                    </p>
-                    <p>
-                        For \(D=163\), the polynomial \(n^2 - n + 41\) stays prime until \(n=41\). Because \(41^2 - 41 + 41 = 41^2\), column 41 is the first mathematical necessity for a composite value.
-                    </p>
+                <h2 class="text-lg font-bold text-slate-800 mb-3 border-b pb-2">Frequency Map</h2>
+                <div class="text-slate-600 space-y-3 text-sm italic">
+                    <p>In this model, the prime generator's constant is the squared natural frequency of the vacuum.</p>
                 </div>
             </div>
-
-            <!-- Col 3: Counter-Example -->
-            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 border-l-4 border-l-red-400">
-                <h2 class="text-lg font-bold text-slate-800 mb-3 border-b pb-2">Non-Unique Counter-Example</h2>
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 border-t-4 border-t-emerald-500">
+                <h2 class="text-lg font-bold text-slate-800 mb-3 border-b pb-2">Euler's Primes</h2>
                 <div class="text-slate-600 space-y-3 text-sm">
-                    <p>For \(D=5\) (not a Heegner number), the ring \(\mathbb{Z}[\sqrt{-5}]\) lacks unique factorization. Witness the number <strong>6</strong>:</p>
-                    <div class="bg-slate-50 p-2 rounded font-mono text-center">
-                        \(6 = 2 \times 3\) <br>
-                        \(6 = (1 + \sqrt{-5})(1 - \sqrt{-5})\)
-                    </div>
-                    <p>
-                        Since there are two distinct ways to factor the same number, the symmetry is broken. This is why polynomials for non-Heegner numbers hit composite values almost immediately.
-                    </p>
+                    <p>\(41, 43, 47, 53, 61, 71, 83...\)</p>
+                    <p>The sequence stays prime as long as the underlying algebraic field is a Principal Ideal Domain.</p>
                 </div>
             </div>
         </div>
@@ -154,69 +173,153 @@
         function updateTable() {
             const maxN = parseInt(document.getElementById('nRange').value);
             document.getElementById('nValue').textContent = maxN;
-
             const headerRow = document.getElementById('tableHeader');
             const tableBody = document.getElementById('tableBody');
-
-            const fractionHeader = "Const (1+D)/4";
-
+            
             headerRow.innerHTML = `
-                <th class="p-4 border-r border-slate-200 sticky left-0 bg-slate-100 z-30 min-w-[100px]">Heegner \(D\)</th>
-                <th class="p-4 border-r border-slate-200 sticky left-[100px] bg-slate-100 z-30 min-w-[140px]">${fractionHeader}</th>
-                ${Array.from({length: maxN}, (_, i) => `<th class="p-2 text-center border-r border-slate-200 min-w-[60px]">\(n=${i+1}\)</th>`).join('')}
+                <th class="p-4 sticky left-0 bg-slate-100 z-30 min-w-[100px]">D</th>
+                <th class="p-4 sticky left-[100px] bg-slate-100 z-30 min-w-[140px]">\(C = \frac{1+D}{4}\)</th>
+                ${Array.from({length: maxN}, (_, i) => `<th class="p-2 text-center min-w-[60px]">\(n=${i+1}\)</th>`).join('')}
             `;
 
             tableBody.innerHTML = '';
             heegnerNumbers.forEach(d => {
                 const constant = (1 + d) / 4;
-                const isNonIntegerD = (d === 1 || d === 2);
-                
                 const row = document.createElement('tr');
-                row.className = `border-b border-slate-100 hover:bg-slate-50 transition-colors group ${isNonIntegerD && !showNonInteger ? 'collapsed' : ''}`;
+                row.className = `border-b border-slate-100 hover:bg-slate-50 transition-colors ${ (d === 1 || d === 2) && !showNonInteger ? 'collapsed' : ''}`;
                 
-                let cellsHtml = `
-                    <td class="p-4 font-bold text-slate-700 border-r border-slate-200 sticky left-0 bg-white group-hover:bg-slate-50 z-20">${d}</td>
-                    <td class="p-4 font-mono text-slate-500 border-r border-slate-200 sticky left-[100px] bg-white group-hover:bg-slate-50 z-20">${constant}</td>
-                `;
+                let cellsHtml = `<td class="p-4 font-bold sticky left-0 bg-white z-20">${d}</td><td class="p-4 font-mono text-slate-500 sticky left-[100px] bg-white z-20">${constant}</td>`;
 
                 for (let n = 1; n <= maxN; n++) {
                     const val = (n * n) - n + constant;
                     const isP = isPrime(val);
                     const isInt = (val % 1 === 0);
-                    
-                    let cellClass = "";
-                    if (isInt) {
-                        cellClass = isP ? 'prime-cell' : 'composite-cell';
-                    } else {
-                        cellClass = 'text-slate-400 italic bg-slate-50';
-                    }
-                    
+                    const cellClass = isInt ? (isP ? 'prime-cell' : 'composite-cell') : 'text-slate-400 italic bg-slate-50';
                     cellsHtml += `<td class="p-2 text-center border-r border-slate-100 ${cellClass}">${val}</td>`;
                 }
-
                 row.innerHTML = cellsHtml;
                 tableBody.appendChild(row);
             });
-
-            if (window.MathJax) {
-                MathJax.typesetPromise();
-            }
+            if (window.MathJax) MathJax.typesetPromise();
         }
+
+        // PHYSICS & STANDING WAVE CANVAS
+        const canvas = document.getElementById('oscCanvas');
+        const ctx = canvas.getContext('2d');
+        const mSlider = document.getElementById('mSlider');
+        const kSlider = document.getElementById('kSlider');
+        const nRange = document.getElementById('nRange');
+        
+        let time = 0;
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const m = parseFloat(mSlider.value);
+            const k = parseFloat(kSlider.value);
+            const maxN = parseInt(nRange.value);
+            const omega = Math.sqrt(k/m);
+            const f = omega / (2 * Math.PI);
+            const T = 1 / f;
+
+            document.getElementById('mDisp').textContent = m.toFixed(1);
+            document.getElementById('kDisp').textContent = k.toFixed(1);
+            document.getElementById('omegaVal').textContent = omega.toFixed(2);
+            document.getElementById('fVal').textContent = f.toFixed(2);
+            document.getElementById('tVal').textContent = T.toFixed(2);
+            document.getElementById('ratioVal').textContent = (k/m).toFixed(1);
+
+            const centerY = canvas.height / 2;
+            const centerX = canvas.width / 2;
+
+            // 1. Draw the Mass-Spring (Physical SHM)
+            const amplitude = 40;
+            const currentY = centerY + amplitude * Math.cos(omega * time);
+            
+            // Draw Spring
+            ctx.beginPath();
+            ctx.strokeStyle = '#64748b';
+            ctx.lineWidth = 2;
+            ctx.moveTo(centerX - 100, 0);
+            for(let i=0; i<20; i++) {
+                ctx.lineTo(centerX - 100 + (i%2 ? 10 : -10), (currentY / 20) * i);
+            }
+            ctx.stroke();
+
+            // Draw Mass (Size grows with m)
+            ctx.beginPath();
+            ctx.fillStyle = '#3b82f6';
+            const radius = 10 + (m * 8);
+            ctx.arc(centerX - 100, currentY, radius, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#1e3a8a';
+            ctx.stroke();
+
+            // 2. Draw Standing Waves (Harmonics mapping to Polynomial steps)
+            const waveAreaX = centerX - 30;
+            const waveWidth = canvas.width - waveAreaX - 30;
+            
+            // Current n-step determined by time loop
+            const nStep = Math.floor((time % 5) * (maxN / 5)) + 1;
+            const val = (nStep * nStep) - nStep + (k/m);
+            const isP = isPrime(Math.round(val));
+
+            ctx.beginPath();
+            ctx.strokeStyle = isP ? '#10b981' : '#ef4444';
+            ctx.lineWidth = isP ? 3 : 1.5;
+            
+            for(let x=0; x<waveWidth; x++) {
+                const perc = x / waveWidth;
+                // Standing wave equation: sin(n * pi * x) * cos(omega * t)
+                // We use nStep to show different harmonics
+                const env = Math.sin(nStep * Math.PI * perc);
+                const osc = Math.cos(omega * time);
+                const y = centerY + (amplitude * 1.5) * env * osc;
+                
+                if(!isP && x % 5 === 0) { // Add noise for composite numbers (broken symmetry)
+                    ctx.lineTo(waveAreaX + x, y + (Math.random() - 0.5) * 10);
+                } else {
+                    ctx.lineTo(waveAreaX + x, y);
+                }
+            }
+            ctx.stroke();
+
+            // Labels for Standing Wave
+            ctx.fillStyle = isP ? '#10b981' : '#ef4444';
+            ctx.font = 'bold 12px monospace';
+            ctx.fillText(`Step n=${nStep}`, waveAreaX, 40);
+            ctx.fillText(`Value=${val.toFixed(1)} (${isP ? 'PRIME' : 'COMPOSITE'})`, waveAreaX, 60);
+
+            time += 0.03;
+            requestAnimationFrame(animate);
+        }
+
+        window.onload = () => {
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            updateTable();
+            animate();
+        };
 
         document.getElementById('toggleCollapsed').addEventListener('click', () => {
             showNonInteger = !showNonInteger;
-            const btn = document.getElementById('toggleCollapsed');
-            btn.textContent = showNonInteger ? 'Hide Non-Integer D' : 'Show Non-Integer D (1, 2)';
+            document.getElementById('toggleCollapsed').textContent = showNonInteger ? 'Hide Non-Integer D' : 'Show Non-Integer D (1, 2)';
             updateTable();
         });
 
         document.getElementById('nRange').addEventListener('input', updateTable);
-        window.onload = updateTable;
+        document.getElementById('preset163').addEventListener('click', () => {
+            mSlider.value = 1.0;
+            kSlider.value = 41;
+        });
+
+        window.onresize = () => {
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+        };
     </script>
 </body>
 </html>
-</body>
-</html>
+
 
 
 
