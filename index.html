@@ -3,525 +3,1019 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Heegner Number & Prime Polynomial Explorer</title>
+    <title>Heegner Numbers: A Differential Equation Perspective</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js" charset="utf-8"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <style>
         .prime-cell { background-color: #dcfce7; color: #166534; font-weight: bold; }
         .composite-cell { background-color: #fee2e2; color: #991b1b; }
-        .table-scroll {
-            scrollbar-width: thin;
-            scrollbar-color: #cbd5e1 #f8fafc;
-        }
-        tr.collapsed { display: none; }
-        .lab-canvas { border-radius: 0.75rem; background: #0f172a; width: 100%; height: 350px; }
-        .preamble-canvas { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 0.5rem; width: 100%; height: 320px; }
-        .math-block { background: #f1f5f9; padding: 1.25rem; border-radius: 0.5rem; font-family: serif; border-left: 4px solid #3b82f6; }
-        .preamble-plate { background: linear-gradient(to right, #ffffff, #f8fafc); border: 2px solid #e2e8f0; border-radius: 1rem; overflow: hidden; }
-        
+        .tab-btn { transition: all 0.3s; }
+        .tab-btn.active { border-bottom: 3px solid #3b82f6; background-color: #eff6ff; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
-        .tab-btn.active { border-bottom: 3px solid #3b82f6; color: #3b82f6; }
-
-        input[type=range] { cursor: pointer; }
+        .ascii-tagline { font-family: monospace; white-space: pre; line-height: 1.2; }
     </style>
 </head>
-<body class="bg-slate-50 min-height-screen p-4 md:p-8">
+<body class="bg-slate-50 min-h-screen p-4 md:p-8">
     <div class="max-w-7xl mx-auto">
-        
-        <header class="mb-6 flex flex-col md:flex-row justify-between items-end gap-4 border-b pb-6">
-            <div>
-                <h1 class="text-3xl font-black text-slate-800 tracking-tight">HEEGNER<span class="text-blue-600">LAB</span></h1>
-                <p class="text-slate-500 font-medium">Algebraic Landscapes & Harmonic Primes</p>
+        <header class="mb-8 text-center">
+            <div class="flex flex-col items-center justify-center mb-6">
+                <div class="ascii-tagline text-[9px] md:text-[11px] bg-slate-100 p-4 rounded-lg border border-slate-300 shadow-lg">
+  _    _                               
+ | |  | | ___  ___  __ _ _ __   ___ _ __ 
+ | |__| |/ _ \/ _ \/ _` | '_ \ / _ \ '__|
+ |  __  |  __/  __/ (_| | | | |  __/ |   
+ |_|  |_|\___|\___|\__, |_| |_|\___|_|   
+                    __/ |  Numbers as Resonances              
+                   |___/                 
+                </div>
+                <h1 class="mt-6 text-4xl font-bold text-slate-800">The 9 Discriminants of Perfect Factorization</h1>
+                <p class="mt-3 text-xl font-medium text-slate-600 max-w-3xl">
+                    Negative discriminants → Bounded oscillations → Unique factorization domains
+                </p>
+                <p class="mt-2 text-sm text-slate-500 italic">
+                    Where standing waves form perfect nodes, primes emerge systematically, LeeMcCullochJames@
+                </p>
             </div>
-            <nav class="flex gap-1 bg-slate-200 p-1 rounded-lg">
-                <button onclick="showTab('preamble')" class="tab-btn active px-4 py-2 text-sm font-bold rounded-md transition-all">1. Preamble</button>
-                <button onclick="showTab('matrix')" class="tab-btn px-4 py-2 text-sm font-bold rounded-md transition-all">2. Matrix</button>
-                <button onclick="showTab('physics')" class="tab-btn px-4 py-2 text-sm font-bold rounded-md transition-all">3. Physics</button>
-            </nav>
         </header>
 
-        <!-- TAB 1: PREAMBLE PLATE -->
-        <div id="preamble" class="tab-content active animate-in fade-in duration-500">
-            <div class="preamble-plate shadow-xl">
-                <div class="bg-slate-800 text-white p-4 flex justify-between items-center">
-                    <h2 class="font-bold tracking-widest text-sm uppercase">Geometry of the Euler Class</h2>
-                    <div class="flex items-center gap-4">
-                        <select id="preambleDSelector" class="bg-slate-700 text-white text-xs p-1 rounded border border-slate-600 outline-none">
-                            <option value="163">D=163 (C=41)</option>
-                            <option value="67">D=67 (C=17)</option>
-                            <option value="43">D=43 (C=11)</option>
-                            <option value="19">D=19 (C=5)</option>
-                            <option value="11">D=11 (C=3)</option>
-                            <option value="7">D=7 (C=2)</option>
-                            <option value="3">D=3 (C=1)</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="p-8 grid lg:grid-cols-2 gap-12 items-start">
-                    <div class="space-y-6">
-                        <h3 class="text-2xl font-bold text-slate-800">The Quadratic Bridge</h3>
-                        <div class="bg-blue-50 p-6 rounded-xl border border-blue-100 font-mono text-xs space-y-4 shadow-inner">
-                            <div>
-                                <span class="text-blue-400">// 1. Standard Form</span><br>
-                                \( f(n) = an^2 + bx + c \) where \( a=1, b=-1, c=C \)
-                            </div>
-                            <div>
-                                <span class="text-blue-400">// 2. The Discriminant Rule</span><br>
-                                \( \Delta = b^2 - 4ac = (-1)^2 - 4(1)(C) = 1 - 4C \)
-                            </div>
-                            <div>
-                                <span class="text-blue-400">// 3. Roots via Quadratic Formula</span><br>
-                                \( n = \frac{-(-1) \pm \sqrt{1 - 4C}}{2(1)} = \frac{1 \pm \sqrt{-D}}{2} \)
-                            </div>
-                            <div class="text-blue-700 font-bold bg-blue-100 p-2 rounded">
-                                CONCLUSION: If \( D > 0 \), roots are complex. The graph never touches the x-axis.
-                            </div>
-                        </div>
-                        <div class="math-block">
-                            <p class="font-bold text-blue-900 mb-2">Pedagogical Note: Vertex & Symmetry</p>
-                            <p class="text-sm text-slate-700">
-                                The polynomial \( n^2 - n + C \) is symmetrical about \( n = 0.5 \). 
-                                We study the range \( n \in [0, C-1] \). For Heegner numbers, this entire integer range results in prime values.
-                            </p>
-                        </div>
-                    </div>
-                    
-                    <div class="space-y-4">
-                        <div class="relative">
-                            <canvas id="preambleGraph" class="preamble-canvas shadow-inner"></canvas>
-                        </div>
-                        <div class="grid grid-cols-2 gap-2 bg-slate-100 p-3 rounded-lg border border-slate-200">
-                           <div class="text-[10px] font-bold text-slate-500 uppercase">
-                               Axis: <span id="metaAxis" class="text-slate-800">n = 0.5</span>
-                           </div>
-                           <div class="text-[10px] font-bold text-slate-500 uppercase text-right">
-                               Intercept: <span id="metaIntercept" class="text-slate-800">f(0) = 41</span>
-                           </div>
-                           <div class="text-[10px] font-bold text-slate-500 uppercase">
-                               Vertex: <span id="metaVertex" class="text-slate-800">(0.5, 40.75)</span>
-                           </div>
-                           <div class="text-[10px] font-bold text-slate-500 uppercase text-right">
-                               Class No: <span class="text-blue-600">h(-D) = 1</span>
-                           </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- TAB 2: MATRIX -->
-        <div id="matrix" class="tab-content animate-in fade-in duration-500">
-            <div class="bg-white p-6 rounded-xl shadow-sm mb-6 flex flex-wrap gap-6 items-center border border-slate-200">
-                <div class="flex flex-col">
-                    <label class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Complexity Horizon (n):</label>
-                    <input type="range" id="nRange" min="5" max="50" value="45" class="w-48 accent-blue-600">
-                    <span id="nValue" class="text-blue-600 font-mono font-bold text-lg">45</span>
-                </div>
-                <button id="toggleCollapsed" class="toggle-btn bg-slate-100 text-slate-700 px-4 py-2 rounded-lg text-xs font-bold border hover:bg-slate-200">
-                    Show Non-Integer D (1, 2)
+        <!-- Tab Navigation -->
+        <div class="bg-white rounded-t-xl border-b-0 border border-slate-200 shadow-sm overflow-x-auto">
+            <div class="flex min-w-max">
+                <button class="tab-btn active px-6 py-4 font-semibold text-slate-700 hover:bg-slate-50" data-tab="overview">
+                    Overview & 3D Visualization
+                </button>
+                <button class="tab-btn px-6 py-4 font-semibold text-slate-700 hover:bg-slate-50" data-tab="matrix">
+                    Prime Matrix Explorer
+                </button>
+                <button class="tab-btn px-6 py-4 font-semibold text-slate-700 hover:bg-slate-50" data-tab="rings">
+                    Integer Ring Extensions
+                </button>
+                <button class="tab-btn px-6 py-4 font-semibold text-slate-700 hover:bg-slate-50" data-tab="shm">
+                    SHM: Standing Waves Theory
+                </button>
+                <button class="tab-btn px-6 py-4 font-semibold text-slate-700 hover:bg-slate-50" data-tab="dynamics">
+                    SHM: Dynamic Visualization
+                </button>
+                <button class="tab-btn px-6 py-4 font-semibold text-slate-700 hover:bg-slate-50" data-tab="forced">
+                    Forced Oscillations & Modular Arithmetic
                 </button>
             </div>
-
-            <div class="overflow-x-auto bg-white rounded-xl shadow-md border border-slate-200 table-scroll mb-8">
-                <table class="w-full text-sm text-left border-collapse">
-                    <thead><tr id="tableHeader" class="bg-slate-50 border-b border-slate-200"></tr></thead>
-                    <tbody id="tableBody"></tbody>
-                </table>
-            </div>
-
-            <div class="grid md:grid-cols-2 gap-6">
-                <div class="bg-amber-50 p-6 rounded-xl border border-amber-100">
-                    <h4 class="font-bold text-amber-900 mb-2 flex items-center gap-2">
-                        <span>💡</span> The Counter Example: D = 5
-                    </h4>
-                    <p class="text-sm text-amber-800 leading-relaxed">
-                        Why aren't all numbers Heegner? Take \( D=5 \). Then \( C = (1+5)/4 = 1.5 \). 
-                        The polynomial \( n^2 - n + 1.5 \) doesn't even produce integers. Even for non-Heegner integers like \( D=13 \) where \( C=4 \), the polynomial \( n^2 - n + 4 \) fails immediately at \( n=4 \) (\(16-4+4=16\), composite). Heegner numbers are the <strong>only</strong> nine integers where the class number of \( \mathbb{Q}(\sqrt{-D}) \) is 1.
-                    </p>
-                </div>
-                <div class="bg-indigo-50 p-6 rounded-xl border border-indigo-100">
-                    <h4 class="font-bold text-indigo-900 mb-2 flex items-center gap-2">
-                        <span>✨</span> Ramanujan's Constant
-                    </h4>
-                    <p class="text-sm text-indigo-800 leading-relaxed">
-                        For the largest Heegner number \( D=163 \), the value \( e^{\pi\sqrt{163}} \) is "almost" an integer: 
-                        <span class="block mt-2 font-mono bg-white/50 p-2 rounded text-center">
-                            262,537,412,640,768,743.99999999999925...
-                        </span>
-                        This deep coincidence links modular forms, elliptic curves, and the very primes you see in the matrix above.
-                    </p>
-                </div>
-            </div>
         </div>
 
-        <!-- TAB 3: PHYSICS -->
-        <div id="physics" class="tab-content animate-in fade-in duration-500">
-            <div class="bg-white p-8 rounded-xl shadow-md border border-slate-200">
-                <div class="grid lg:grid-cols-2 gap-10">
-                    <div class="space-y-6">
-                        <div class="math-block">
-                            <h3 class="text-xl font-bold text-slate-800 mb-4">Manual Resonance Tuning</h3>
-                            <div class="space-y-6">
-                                <div>
-                                    <div class="flex justify-between mb-1">
-                                        <label class="text-xs font-bold text-slate-500 uppercase">Tuning Step (Harmonic n)</label>
-                                        <span id="nPhysDisp" class="text-blue-600 font-mono font-bold">1</span>
-                                    </div>
-                                    <input type="range" id="nPhysSlider" min="1" max="40" step="1" value="1" class="w-full accent-blue-600">
-                                </div>
-
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div class="space-y-2">
-                                        <div class="flex justify-between">
-                                            <label class="text-xs font-bold text-slate-500 uppercase">Mass (m)</label>
-                                            <span id="mValDisplay" class="text-blue-600 font-mono font-bold">1.0</span>
-                                        </div>
-                                        <input type="range" id="mPhysSlider" min="0.5" max="10" step="0.5" value="1" class="w-full accent-slate-600">
-                                    </div>
-                                    <div class="space-y-2">
-                                        <div class="flex justify-between">
-                                            <label class="text-xs font-bold text-slate-500 uppercase">Spring (k)</label>
-                                            <span id="kValDisplay" class="text-blue-600 font-mono font-bold">41.0</span>
-                                        </div>
-                                        <input type="range" id="kPhysSlider" min="1" max="100" step="1" value="41" class="w-full accent-blue-600">
-                                    </div>
-                                </div>
-
-                                <div class="p-4 bg-slate-50 rounded border-dashed border-2 border-slate-200 text-center">
-                                    <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Ratio \( k/m \) (Effective Prime Constant C)</p>
-                                    <span id="ratioDisplay" class="text-2xl font-black text-slate-700 font-mono">41.0</span>
-                                </div>
+        <!-- Tab Contents -->
+        <div class="bg-white rounded-b-xl shadow-md border border-slate-200 border-t-0 p-6">
+            
+            <!-- OVERVIEW TAB -->
+            <div id="overview" class="tab-content active">
+                <div class="space-y-8">
+                    <!-- Big Picture -->
+                    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-8 rounded-xl border-l-4 border-blue-600">
+                        <h2 class="text-3xl font-bold text-slate-800 mb-6">From Quadratic Discriminants to Heegner Numbers</h2>
+                        
+                        <!-- Standard Form -->
+                        <div class="bg-white p-6 rounded-lg border-2 border-blue-200 mb-6">
+                            <h3 class="text-xl font-bold text-blue-900 mb-3">1. Standard Quadratic Form</h3>
+                            <div class="text-lg text-slate-700 mb-3">
+                                Consider the generic quadratic:
+                            </div>
+                            <div class="bg-blue-50 p-4 rounded-lg font-mono text-center text-xl border border-blue-300">
+                                \(f(n) = an^2 + bn + c\) &nbsp;&nbsp; where \(a=1, b=-1, c=C\)
                             </div>
                         </div>
 
-                        <div class="space-y-5 bg-slate-50 p-6 rounded-xl border border-slate-100">
-                            <label class="text-sm font-bold text-slate-700">Preset Prime Field Potential (C)</label>
-                            <select id="physCSelector" class="w-full p-3 bg-white border border-slate-300 rounded-lg font-bold">
-                                <option value="41">Euler Prime Field (C=41)</option>
-                                <option value="17">D=67 (C=17)</option>
-                                <option value="11">D=43 (C=11)</option>
-                                <option value="5">D=19 (C=5)</option>
-                                <option value="3">D=11 (C=3)</option>
-                                <option value="1.5">D=5 (Counter Example C=1.5)</option>
-                                <option value="manual" disabled>-- Manual Tuning Active --</option>
-                            </select>
-                            <p class="text-[10px] text-slate-400 italic">Changing m or k manually will override these presets.</p>
-                        </div>
-                    </div>
-
-                    <div class="space-y-4">
-                        <canvas id="oscCanvas" class="lab-canvas"></canvas>
-                        <div id="physMonitor" class="p-4 bg-blue-900 text-blue-100 rounded-xl text-[10px] font-mono shadow-lg flex justify-between items-center">
-                            <div>
-                                STATUS: <span id="stateLabel" class="text-emerald-400 font-bold">STABLE RESONANCE</span>
+                        <!-- Discriminant -->
+                        <div class="bg-white p-6 rounded-lg border-2 border-indigo-200 mb-6">
+                            <h3 class="text-xl font-bold text-indigo-900 mb-3">2. The Discriminant Rule</h3>
+                            <div class="text-lg text-slate-700 mb-3">
+                                The discriminant determines the nature of roots:
                             </div>
-                            <div class="text-blue-300">k/m Phase Alignment</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Differential Equation Post-Amble -->
-                <div class="mt-10 border-t pt-8">
-                    <h3 class="text-2xl font-bold text-slate-800 mb-6">Harmonic Mechanics & Prime Stability</h3>
-                    <div class="grid md:grid-cols-2 gap-8">
-                        <div class="math-block">
-                            <p class="font-bold text-slate-900 mb-2 underline">The Governing Equation</p>
-                            <p class="text-sm mb-4">The spring-mass system follows the homogeneous second-order differential equation:</p>
-                            <div id="mathODE" class="text-lg bg-white/50 p-4 rounded text-center">
-                                $$ m \ddot{x} + kx = 0 $$
+                            <div class="bg-indigo-50 p-4 rounded-lg font-mono text-center text-xl border border-indigo-300 mb-3">
+                                \(\Delta = b^2 - 4ac = (-1)^2 - 4(1)(C) = 1 - 4C\)
                             </div>
-                            <p class="text-[11px] text-slate-600 mt-4">
-                                This leads to a natural frequency defined solely by the system properties:
-                                <span class="block text-center py-2 font-bold text-blue-700">$$ \omega_n = \sqrt{\frac{k}{m}} $$</span>
-                                Where cyclic frequency is \( f = \frac{\omega_n}{2\pi} \) and the period is \( T = \frac{1}{f} = 2\pi\sqrt{\frac{m}{k}} \).
+                            <div class="text-lg text-slate-700">
+                                Setting \(C = \frac{1+D}{4}\), we get: \(\Delta = 1 - 4 \cdot \frac{1+D}{4} = -D\)
+                            </div>
+                        </div>
+
+                        <!-- Roots -->
+                        <div class="bg-white p-6 rounded-lg border-2 border-purple-200 mb-6">
+                            <h3 class="text-xl font-bold text-purple-900 mb-3">3. Roots via Quadratic Formula</h3>
+                            <div class="bg-purple-50 p-4 rounded-lg font-mono text-center text-xl border border-purple-300">
+                                \(n = \frac{-(-1) \pm \sqrt{1-4C}}{2(1)} = \frac{1 \pm \sqrt{-D}}{2}\)
+                            </div>
+                            <div class="bg-blue-100 p-4 mt-4 rounded-lg border-l-4 border-blue-600">
+                                <p class="text-slate-800 font-semibold">
+                                    <strong>CONCLUSION:</strong> If \(D > 0\), roots are <strong>complex conjugates</strong>. 
+                                    The polynomial never touches the real axis—purely oscillatory behavior in \(\mathbb{C}\).
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Physical Intuition -->
+                        <div class="text-lg text-slate-700 space-y-4 leading-relaxed mt-6">
+                            <p>
+                                The characteristic equation \(n^2 - n + C = 0\) has discriminant \(\Delta = -D\). 
+                                For <strong>positive discriminants</strong> \(D > 0\), solutions are <strong>purely imaginary</strong>: 
+                                \(n = \frac{1 \pm i\sqrt{D}}{2}\), representing <strong>bounded harmonic motion</strong>.
+                            </p>
+                            <p>
+                                The <strong>9 Heegner numbers</strong> are special frequencies where this oscillator has <strong>unique factorization</strong>—
+                                analogous to standing wave modes with no degenerate overtones. At these discriminants, the algebraic structure 
+                                \(\mathbb{Z}[\frac{1+\sqrt{-D}}{2}]\) forms a <strong>unique factorization domain</strong>.
+                            </p>
+                            <p class="text-2xl font-bold text-blue-800 bg-white/60 p-4 rounded-lg border border-blue-300 text-center">
+                                \(D \in \{1, 2, 3, 7, 11, 19, 43, 67, 163\}\)
+                            </p>
+                            <p>
+                                For larger \(D\), multiple factorizations emerge—the system becomes <strong>chaotic</strong>, 
+                                like coupled oscillators with beating interference patterns. Only at these 9 resonant frequencies 
+                                does the algebra remain <strong>coherent</strong>.
                             </p>
                         </div>
-                        <div class="bg-slate-800 text-white p-6 rounded-xl shadow-inner">
-                            <p class="text-blue-400 font-bold mb-2 uppercase text-xs tracking-widest">Active System Expression</p>
-                            <div id="liveMathPhys" class="font-serif text-xl mb-4 py-2 border-b border-slate-700 text-center">
-                                $$ \omega_n = \sqrt{\frac{41}{1}} \approx 6.40 \, \text{rad/s} $$
+                    </div>
+
+                    <!-- 3D Visualization -->
+                    <div class="bg-white p-6 rounded-xl border border-slate-300 shadow-sm">
+                        <h3 class="text-2xl font-bold text-slate-800 mb-4">Complex Plane: Heegner Discriminants as Poles</h3>
+                        <p class="text-slate-600 mb-4">
+                            Each Heegner number appears as a <strong>resonant pole</strong> on the imaginary axis. 
+                            The z-axis shows \(-|D|\) to emphasize depth of the "potential well"—\(D=163\) is the deepest stable resonance.
+                        </p>
+                        <div id="plot3d" style="width:100%; height:600px;"></div>
+                    </div>
+
+                    <!-- The 9 Discriminants Table -->
+                    <div class="grid md:grid-cols-3 gap-6">
+                        <div class="bg-slate-50 p-5 rounded-lg border border-slate-300">
+                            <h4 class="text-lg font-bold text-slate-700 mb-3">Small Discriminants</h4>
+                            <div class="space-y-2 text-sm font-mono">
+                                <div class="flex justify-between"><span>D = 1</span><span class="text-blue-600">±i</span></div>
+                                <div class="flex justify-between"><span>D = 2</span><span class="text-blue-600">±i√2</span></div>
+                                <div class="flex justify-between"><span>D = 3</span><span class="text-blue-600">±i√3</span></div>
                             </div>
-                            <div class="grid grid-cols-2 gap-4 text-[11px]">
-                                <div class="bg-slate-700/50 p-3 rounded">
-                                    <p class="text-blue-300 font-bold mb-1">Frequency (f)</p>
-                                    <span id="liveFreq">1.02 Hz</span>
-                                </div>
-                                <div class="bg-slate-700/50 p-3 rounded">
-                                    <p class="text-blue-300 font-bold mb-1">Period (T)</p>
-                                    <span id="livePeriod">0.98 s</span>
-                                </div>
+                        </div>
+                        <div class="bg-slate-50 p-5 rounded-lg border border-slate-300">
+                            <h4 class="text-lg font-bold text-slate-700 mb-3">Medium Discriminants</h4>
+                            <div class="space-y-2 text-sm font-mono">
+                                <div class="flex justify-between"><span>D = 7</span><span class="text-blue-600">±i√7</span></div>
+                                <div class="flex justify-between"><span>D = 11</span><span class="text-blue-600">±i√11</span></div>
+                                <div class="flex justify-between"><span>D = 19</span><span class="text-blue-600">±i√19</span></div>
+                                <div class="flex justify-between"><span>D = 43</span><span class="text-blue-600">±i√43</span></div>
                             </div>
-                            <div class="mt-4 space-y-2 text-xs opacity-80">
-                                <p><strong>Characteristic Equation:</strong> \( r^2 + \frac{k}{m} = 0 \)</p>
-                                <p><strong>General Solution:</strong> \( x(t) = A \cos(\omega_n t) + B \sin(\omega_n t) \)</p>
-                                <p><strong>Resonance:</strong> Alignment occurs when the system energy maps to a Heegner Prime.</p>
+                        </div>
+                        <div class="bg-gradient-to-br from-yellow-50 to-amber-100 p-5 rounded-lg border-2 border-amber-400">
+                            <h4 class="text-lg font-bold text-amber-900 mb-3">Maximum Discriminant</h4>
+                            <div class="space-y-2 text-sm">
+                                <div class="flex justify-between font-mono">
+                                    <span class="text-lg">D = 163</span>
+                                    <span class="text-blue-700 font-bold">±i√163</span>
+                                </div>
+                                <p class="text-xs text-amber-800 mt-3 leading-relaxed">
+                                    The deepest stable resonance. Produces \(n^2-n+41\), prime for \(n=1\) to \(40\).
+                                    Linked to \(e^{\pi\sqrt{163}}\) ≈ integer.
+                                </p>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <footer class="mt-12 pt-8 border-t border-slate-200 grid md:grid-cols-3 gap-8 text-slate-400 text-[10px] uppercase tracking-widest pb-12">
-            <div><strong>Identity:</strong> \( n^2 - n + C \)</div>
-            <div class="text-center font-mono opacity-50">HEEGNER LAB ARCHIVE // 2026</div>
-            <div class="text-right"><strong>Roots:</strong> \( \frac{1 \pm i\sqrt{D}}{2} \)</div>
-        </footer>
+            <!-- MATRIX TAB -->
+            <div id="matrix" class="tab-content">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-slate-800 mb-3">Prime-Generating Polynomial Matrix</h2>
+                    <p class="text-slate-600 mb-4">
+                        For \(D\) a Heegner number, the polynomial \(f(n) = n^2 - n + C\) where \(C = \frac{1+D}{4}\) 
+                        generates primes with remarkable efficiency. The table shows output for increasing \(n\).
+                    </p>
+                </div>
+
+                <div class="bg-white p-4 rounded-lg shadow-sm mb-6 flex flex-wrap gap-4 items-center border border-slate-200">
+                    <div class="flex flex-col">
+                        <label class="text-sm font-semibold text-slate-700 mb-1">Max \(n\) (Columns):</label>
+                        <input type="range" id="nRange" min="10" max="50" value="45" class="w-64 accent-blue-600">
+                        <span id="nValue" class="text-center font-mono text-blue-600 font-bold text-lg">45</span>
+                    </div>
+                    <div class="flex flex-col items-center border-l px-4 border-slate-200">
+                        <button id="toggleCollapsed" class="bg-slate-800 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-sm hover:bg-slate-700">
+                            Show Non-Integer C (D=1,2)
+                        </button>
+                    </div>
+                    <div class="text-sm text-slate-500 max-w-md border-l pl-4 border-slate-200">
+                        <p><strong>D=163:</strong> \(n^2 - n + 41\) is prime until \(n=41\), where \(41^2 - 41 + 41 = 41^2\).</p>
+                        <div class="mt-2 flex gap-4 text-xs">
+                            <span><span class="inline-block w-3 h-3 bg-green-100 border border-green-400"></span> Prime</span>
+                            <span><span class="inline-block w-3 h-3 bg-red-100 border border-red-400"></span> Composite</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto rounded-lg border border-slate-300">
+                    <table class="w-full text-sm border-collapse">
+                        <thead>
+                            <tr id="tableHeader" class="bg-slate-100 border-b border-slate-300"></tr>
+                        </thead>
+                        <tbody id="tableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- RINGS TAB -->
+            <div id="rings" class="tab-content">
+                <h2 class="text-2xl font-bold text-slate-800 mb-4">Integer Ring Extensions & Counterexamples</h2>
+                <p class="text-lg text-slate-600 mb-6">
+                    For a quadratic field \(\mathbb{Q}(\sqrt{-D})\), the ring of integers \(\mathbb{Z}[\omega]\) 
+                    (where \(\omega = \frac{1+\sqrt{-D}}{2}\) if \(D \equiv 3 \pmod{4}\)) has unique factorization 
+                    <strong>only</strong> for the 9 Heegner numbers. For all other \(D\), non-unique factorizations emerge.
+                </p>
+
+                <div class="grid md:grid-cols-2 gap-6">
+                    <!-- D=5 -->
+                    <div class="bg-red-50 border-2 border-red-300 p-6 rounded-xl">
+                        <h3 class="text-xl font-bold text-red-900 mb-3 flex items-center gap-2">
+                            <span class="text-2xl">⚠</span> \(D = 5\): Non-Unique Factorization
+                        </h3>
+                        <div class="space-y-3 text-slate-700">
+                            <p>In \(\mathbb{Z}[\sqrt{-5}]\), the number <strong>6</strong> factors two distinct ways:</p>
+                            <div class="bg-white p-4 rounded-lg font-mono text-center text-lg space-y-2 border border-red-200">
+                                <div>\(6 = 2 \times 3\)</div>
+                                <div>\(6 = (1 + \sqrt{-5})(1 - \sqrt{-5})\)</div>
+                            </div>
+                            <p class="text-sm">
+                                <strong>Norm check:</strong> \(N(1+\sqrt{-5}) = 1^2 + 5 = 6\), and \(N(2)=4\), \(N(3)=9\) are distinct norms.
+                                These are <strong>genuinely inequivalent</strong> factorizations—units cannot relate them.
+                            </p>
+                            <p class="text-sm italic">
+                                The polynomial \(n^2-n+\frac{6}{4}\) is non-integral; even when adjusted, composites appear at \(n=2\).
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- D=6 -->
+                    <div class="bg-red-50 border-2 border-red-300 p-6 rounded-xl">
+                        <h3 class="text-xl font-bold text-red-900 mb-3 flex items-center gap-2">
+                            <span class="text-2xl">⚠</span> \(D = 6\): Another Failure
+                        </h3>
+                        <div class="space-y-3 text-slate-700">
+                            <p>In \(\mathbb{Z}[\sqrt{-6}]\), the number <strong>10</strong> factors non-uniquely:</p>
+                            <div class="bg-white p-4 rounded-lg font-mono text-center text-lg space-y-2 border border-red-200">
+                                <div>\(10 = 2 \times 5\)</div>
+                                <div>\(10 = (2 + \sqrt{-6})(2 - \sqrt{-6})\)</div>
+                            </div>
+                            <p class="text-sm">
+                                <strong>Verification:</strong> \(N(2+\sqrt{-6}) = 4 + 6 = 10\). Again, norms differ: \(N(2)=4\), \(N(5)=25\).
+                            </p>
+                            <p class="text-sm italic">
+                                The polynomial \(n^2-n+\frac{7}{4}\) produces non-integers; adjusted forms hit composites by \(n=3\).
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- D=10 -->
+                    <div class="bg-red-50 border-2 border-red-300 p-6 rounded-xl">
+                        <h3 class="text-xl font-bold text-red-900 mb-3 flex items-center gap-2">
+                            <span class="text-2xl">⚠</span> \(D = 10\): Rapid Breakdown
+                        </h3>
+                        <div class="space-y-3 text-slate-700">
+                            <p>In \(\mathbb{Z}[\sqrt{-10}]\), the number <strong>14</strong> has dual factorizations:</p>
+                            <div class="bg-white p-4 rounded-lg font-mono text-center text-lg space-y-2 border border-red-200">
+                                <div>\(14 = 2 \times 7\)</div>
+                                <div>\(14 = (2 + \sqrt{-10})(2 - \sqrt{-10})\)</div>
+                            </div>
+                            <p class="text-sm">
+                                <strong>Norm:</strong> \(N(2+\sqrt{-10}) = 4 + 10 = 14\). The elements \(2, 7, 2\pm\sqrt{-10}\) are all irreducible but not associate.
+                            </p>
+                            <p class="text-sm italic">
+                                Polynomial \(n^2-n+\frac{11}{4}\): non-integral constant; even integer adjustments fail at \(n=2\).
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- D=15 -->
+                    <div class="bg-red-50 border-2 border-red-300 p-6 rounded-xl">
+                        <h3 class="text-xl font-bold text-red-900 mb-3 flex items-center gap-2">
+                            <span class="text-2xl">⚠</span> \(D = 15\): Class Number \(h=2\)
+                        </h3>
+                        <div class="space-y-3 text-slate-700">
+                            <p>The class number is \(h(\mathbb{Q}(\sqrt{-15})) = 2\), meaning two ideal classes. Example: <strong>4</strong> factors as:</p>
+                            <div class="bg-white p-4 rounded-lg font-mono text-center text-lg space-y-2 border border-red-200">
+                                <div>\(4 = 2 \times 2\)</div>
+                                <div>\(4 = \frac{(1+\sqrt{-15})(1-\sqrt{-15})}{4}\) (in ring of integers)</div>
+                            </div>
+                            <p class="text-sm">
+                                More precisely, \(2\) ramifies: \((2) = \mathfrak{p}^2\) for some prime ideal \(\mathfrak{p}\), 
+                                but this ideal is not principal in the same class as \((2)\).
+                            </p>
+                            <p class="text-sm italic">
+                                Prime-generating polynomial breaks down immediately; composites at \(n=1\).
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8 bg-blue-50 border-l-4 border-blue-600 p-6 rounded-r-xl">
+                    <h3 class="text-xl font-bold text-blue-900 mb-3">Why Heegner Numbers Avoid This</h3>
+                    <p class="text-slate-700 leading-relaxed">
+                        For the 9 Heegner discriminants, the class number is exactly \(h=1\), meaning <strong>every ideal is principal</strong>. 
+                        This algebraic purity translates to unique factorization, which in turn allows the polynomial \(n^2-n+C\) to 
+                        systematically avoid composites until the algebraically forced breakdown at \(n=C\) (where \(f(C)=C^2\)).
+                    </p>
+                    <p class="text-slate-700 leading-relaxed mt-3">
+                        <strong>Physical analogy:</strong> Non-Heegner \(D\) introduce "beat frequencies"—interference patterns from 
+                        degenerate modes. Heegner \(D\) are pure tones with no overtone degeneracy.
+                    </p>
+                </div>
+            </div>
+
+            <!-- SHM TAB -->
+            <div id="shm" class="tab-content">
+                <h2 class="text-2xl font-bold text-slate-800 mb-4">Simple Harmonic Motion: Standing Waves & Primes</h2>
+                
+                <div class="space-y-6">
+                    <div class="bg-gradient-to-r from-purple-50 to-blue-50 p-6 rounded-xl border-l-4 border-purple-600">
+                        <h3 class="text-xl font-bold text-slate-800 mb-3">The Differential Equation</h3>
+                        <div class="text-slate-700 space-y-3">
+                            <p>Consider the operator \(\frac{d^2}{dx^2} + D = 0\), with boundary conditions. Solutions:</p>
+                            <div class="bg-white p-4 rounded-lg font-mono text-center text-lg border border-purple-200">
+                                \(x(t) = A\cos(\sqrt{D}\,t) + B\sin(\sqrt{D}\,t)\)
+                            </div>
+                            <p>
+                                For <strong>\(D < 0\)</strong> (Heegner case), set \(\omega = \sqrt{|D|}\). Solutions become:
+                            </p>
+                            <div class="bg-white p-4 rounded-lg font-mono text-center text-lg border border-purple-200">
+                                \(x(t) = Ae^{-\omega t} + Be^{\omega t}\) &nbsp; (exponential decay/growth)
+                            </div>
+                            <p>
+                                But in the <strong>complex domain</strong>, we recover oscillatory \(e^{i\omega t}\), representing 
+                                <strong>standing waves</strong> with nodes at specific integers.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="bg-white p-5 rounded-xl border border-slate-300 shadow-sm">
+                            <h4 class="text-lg font-bold text-slate-800 mb-3">Primes as Node Points</h4>
+                            <p class="text-slate-600 text-sm leading-relaxed">
+                                In a standing wave, <strong>nodes</strong> are points of zero displacement—stable, discrete locations. 
+                                For \(D=163\), the polynomial \(n^2-n+41\) produces primes at \(n=1,2,\ldots,40\)—these are the 
+                                <strong>integer nodes</strong> where the wave function is "pure" (prime).
+                            </p>
+                            <p class="text-slate-600 text-sm mt-3 leading-relaxed">
+                                At \(n=41\), the wave hits a <strong>resonance</strong>: \(41^2-41+41 = 41^2\), a perfect square. 
+                                This is where the system "self-interferes," producing the first composite.
+                            </p>
+                        </div>
+
+                        <div class="bg-white p-5 rounded-xl border border-slate-300 shadow-sm">
+                            <h4 class="text-lg font-bold text-slate-800 mb-3">Composites as Superposition</h4>
+                            <p class="text-slate-600 text-sm leading-relaxed">
+                                A composite number \(n = pq\) corresponds to a <strong>superposition of modes</strong>—two (or more) 
+                                standing waves interfering. For non-Heegner \(D\), these beating patterns dominate immediately.
+                            </p>
+                            <p class="text-slate-600 text-sm mt-3 leading-relaxed">
+                                Heegner discriminants suppress multi-mode interference until the algebraic structure forces it. 
+                                The <strong>unique factorization</strong> property ensures no "hidden harmonics" pollute the prime sequence.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-100 p-6 rounded-xl border border-slate-300">
+                        <h4 class="text-lg font-bold text-slate-800 mb-3">Energy & Class Number</h4>
+                        <p class="text-slate-700 leading-relaxed">
+                            In SHM, total energy \(E = \frac{1}{2}m\omega^2 A^2\) is quantized for bound states. 
+                            The <strong>class number \(h=1\)</strong> is analogous to a single energy level—no degeneracy. 
+                            For \(h>1\), multiple states coexist at the "same energy," allowing non-unique factorizations.
+                        </p>
+                        <p class="text-slate-700 leading-relaxed mt-3">
+                            <strong>Heegner numbers are the 9 discriminants where the energy spectrum is non-degenerate.</strong>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DYNAMICS TAB -->
+            <div id="dynamics" class="tab-content">
+                <h2 class="text-2xl font-bold text-slate-800 mb-4">Melde's Experiment: Resonant Harmonics & Prime Generation</h2>
+                
+                <div class="bg-gradient-to-r from-indigo-50 to-purple-50 p-6 rounded-xl border-l-4 border-indigo-600 mb-6">
+                    <p class="text-slate-700 leading-relaxed">
+                        <strong>Melde's string apparatus:</strong> String of fixed length \(L\), vibrated on the left by a tuning fork. 
+                        The right end has a <strong>hanging load</strong> providing tension \(T\). 
+                        The <strong>linear mass density μ</strong> determines the wave velocity \(v = \sqrt{T/\mu}\). 
+                        When \(f = n \cdot f_0\) where \(f_0 = \frac{1}{2L}\sqrt{\frac{T}{\mu}}\), 
+                        <strong>standing waves</strong> form (green)—nodes represent primes. 
+                        Off-resonance produces <strong>traveling wave beats</strong> (red interference)—composites emerge.
+                    </p>
+                </div>
+
+                <div class="bg-white rounded-xl border-2 border-slate-300 shadow-lg overflow-hidden">
+                    <!-- Control Panel -->
+                    <div class="bg-slate-100 p-6 border-b-2 border-slate-300">
+                        <h3 class="text-xl font-bold text-slate-800 mb-4">Manual Resonance Tuning</h3>
+                        
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <div class="flex justify-between items-center mb-2">
+                                    <label class="text-sm font-semibold text-slate-700 uppercase tracking-wide">
+                                        Tuning Step (Harmonic N)
+                                    </label>
+                                    <span id="nDisplay" class="text-3xl font-bold text-blue-600">17</span>
+                                </div>
+                                <input type="range" id="nSlider" min="1" max="45" value="17" 
+                                       class="w-full h-3 bg-blue-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
+                                <p class="text-xs text-slate-500 mt-1">Driving frequency: f = n · f₀ determines standing wave mode</p>
+                            </div>
+                            
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <div class="flex justify-between items-center mb-2">
+                                        <label class="text-xs font-semibold text-slate-600 uppercase">Linear Density (μ)</label>
+                                        <span id="muDisplay" class="text-xl font-bold text-slate-700">1.0</span>
+                                    </div>
+                                    <input type="range" id="muSlider" min="0.5" max="3.0" step="0.1" value="1.0" 
+                                           class="w-full h-2 bg-slate-300 rounded-lg appearance-none cursor-pointer">
+                                    <p class="text-[10px] text-slate-500 mt-1">g/cm (string material)</p>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between items-center mb-2">
+                                        <label class="text-xs font-semibold text-slate-600 uppercase">Tension (T)</label>
+                                        <span id="tensionDisplay" class="text-xl font-bold text-blue-700">25.0</span>
+                                    </div>
+                                    <input type="range" id="tensionSlider" min="10" max="100" step="0.5" value="25.0" 
+                                           class="w-full h-2 bg-blue-300 rounded-lg appearance-none cursor-pointer accent-blue-600">
+                                    <p class="text-[10px] text-slate-500 mt-1">N (from hanging load)</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 bg-white p-4 rounded-lg border-2 border-slate-300">
+                            <div class="text-xs text-slate-500 uppercase tracking-wider text-center mb-1">
+                                Ratio T/μ (Effective Prime Constant C)
+                            </div>
+                            <div class="text-5xl font-bold text-slate-800 text-center" id="cDisplay">25.0</div>
+                            <div class="text-xs text-slate-500 text-center mt-1">
+                                Wave velocity: <span id="waveVelocity" class="font-mono">v = √(T/μ) = 5.0 m/s</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Melde's String Visualization -->
+                    <div class="bg-slate-900 p-8 relative" style="height: 450px;">
+                        <svg id="meldeString" width="100%" height="100%" viewBox="0 0 900 400">
+                            <!-- Vibrating driver (left end) -->
+                            <g id="driverAssembly">
+                                <rect x="10" y="180" width="30" height="40" fill="#64748b" stroke="#475569" stroke-width="2" rx="3"/>
+                                <line x1="25" y1="180" x2="25" y2="160" stroke="#94a3b8" stroke-width="2"/>
+                                <circle id="driver" cx="25" cy="200" r="12" fill="#3b82f6" stroke="#1e40af" stroke-width="3"/>
+                                <text x="25" y="235" font-family="sans-serif" font-size="10" fill="#94a3b8" text-anchor="middle">Tuning Fork</text>
+                            </g>
+                            
+                            <!-- String (wave) -->
+                            <path id="waveString" d="" stroke="#10b981" stroke-width="4" fill="none" stroke-linecap="round"/>
+                            
+                            <!-- Hanging load (right end) providing tension -->
+                            <g id="loadAssembly">
+                                <line id="loadString" x1="875" y1="200" x2="875" y2="280" stroke="#94a3b8" stroke-width="2" stroke-dasharray="3,3"/>
+                                <rect id="loadMass" x="860" y="280" width="30" height="40" fill="#ef4444" stroke="#991b1b" stroke-width="2" rx="2"/>
+                                <text x="875" y="335" font-family="sans-serif" font-size="10" fill="#94a3b8" text-anchor="middle">Load (T)</text>
+                            </g>
+                            
+                            <!-- Node markers (only visible in standing wave mode) -->
+                            <g id="nodeMarkers"></g>
+                            
+                            <!-- Status bar -->
+                            <rect x="20" y="360" width="860" height="35" rx="5" fill="#1e3a8a" opacity="0.9"/>
+                            <text x="450" y="383" font-family="monospace" font-size="16" fill="#60a5fa" text-anchor="middle" font-weight="bold">
+                                <tspan id="statusText">STATUS: WAVE INTERFERENCE</tspan>
+                            </text>
+                            <text x="850" y="383" font-family="monospace" font-size="11" fill="#94a3b8" text-anchor="end">
+                                T/μ Resonance Check
+                            </text>
+                        </svg>
+                    </div>
+
+                    <!-- Preset selector -->
+                    <div class="bg-slate-100 p-4 border-t-2 border-slate-300">
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">Preset Prime Field Potential (C)</label>
+                        <select id="presetSelect" class="w-full px-4 py-2 border-2 border-slate-300 rounded-lg font-mono text-lg bg-white">
+                            <option value="manual">-- Manual Tuning Active --</option>
+                            <option value="163">D=163, C=41 (Ramanujan's Constant)</option>
+                            <option value="67">D=67, C=17</option>
+                            <option value="43">D=43, C=11</option>
+                            <option value="19">D=19, C=5</option>
+                            <option value="11">D=11, C=3</option>
+                            <option value="7">D=7, C=2</option>
+                        </select>
+                        <p class="text-xs text-slate-500 mt-2 italic">
+                            Presets set T and μ such that T/μ equals a Heegner constant. Manual tuning shows interference patterns for non-Heegner ratios.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Theory Section -->
+                <div class="mt-8 grid md:grid-cols-2 gap-6">
+                    <div class="bg-green-50 border-2 border-green-500 p-6 rounded-xl">
+                        <h3 class="text-xl font-bold text-green-900 mb-3 flex items-center gap-2">
+                            <span class="text-2xl">✓</span> Standing Waves (Heegner Resonance)
+                        </h3>
+                        <div class="text-slate-700 space-y-3 text-sm leading-relaxed">
+                            <p>
+                                <strong>Condition:</strong> \(f = n \cdot f_0\) where \(f_0 = \frac{1}{2L}\sqrt{\frac{T}{\mu}}\)
+                            </p>
+                            <p>
+                                When \(\frac{T}{\mu}\) is a Heegner constant \(C\), the string forms <strong>stationary nodes</strong>—
+                                points of zero displacement. The \(n\)-th harmonic has \(n+1\) nodes.
+                            </p>
+                            <div class="bg-white p-3 rounded-lg border border-green-300 font-mono text-center text-sm">
+                                \(y(x,t) = A\sin\left(\frac{n\pi x}{L}\right)\cos(\omega t)\)
+                            </div>
+                            <p class="italic">
+                                <strong>Prime interpretation:</strong> Each node is a "pure" factorization—no interference from other modes. 
+                                This is why \(n^2 - n + C\) stays prime: the algebra is <strong>node-locked</strong>.
+                            </p>
+                            <p class="text-xs">
+                                The velocity \(v = \sqrt{T/\mu}\) and wavelength \(\lambda = \frac{2L}{n}\) satisfy \(v = f\lambda\).
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="bg-red-50 border-2 border-red-500 p-6 rounded-xl">
+                        <h3 class="text-xl font-bold text-red-900 mb-3 flex items-center gap-2">
+                            <span class="text-2xl">⚠</span> Traveling Wave Interference (Non-Heegner)
+                        </h3>
+                        <div class="text-slate-700 space-y-3 text-sm leading-relaxed">
+                            <p>
+                                <strong>Condition:</strong> \(f \neq n \cdot f_0\) (off-resonance)
+                            </p>
+                            <p>
+                                When \(\frac{T}{\mu}\) is <strong>not</strong> a Heegner constant, the driving frequency doesn't match 
+                                natural harmonics. Incident and reflected waves superpose with <strong>different frequencies</strong>, 
+                                creating <strong>beat patterns</strong>—amplitude modulation.
+                            </p>
+                            <div class="bg-white p-3 rounded-lg border border-red-300 font-mono text-center text-sm">
+                                \(y(x,t) = 2A\cos\left(\frac{\Delta\omega}{2}t\right)\sin(\bar{k}x - \bar{\omega}t)\)
+                            </div>
+                            <p class="italic">
+                                <strong>Composite emergence:</strong> The envelope \(\cos(\Delta\omega t/2)\) creates "beats"—
+                                periodic amplitude oscillations. These represent non-unique factorizations where multiple modes interfere.
+                            </p>
+                            <p class="text-xs">
+                                Beat frequency: \(f_{beat} = |f - n \cdot f_0|\). The string oscillates between constructive and destructive interference.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Melde's Physical Setup -->
+                <div class="mt-6 bg-white p-6 rounded-xl border-2 border-slate-300">
+                    <h3 class="text-2xl font-bold text-slate-800 mb-4">Melde's Experiment Setup & Class Number</h3>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="space-y-3 text-slate-700 text-sm leading-relaxed">
+                            <p>
+                                <strong>Apparatus:</strong> A string of fixed length \(L\), linear mass density \(\mu\) (material property), 
+                                under tension \(T\) from a hanging load. Left end driven by tuning fork at frequency \(f\).
+                            </p>
+                            <p>
+                                <strong>Wave velocity:</strong> \(v = \sqrt{\frac{T}{\mu}}\). The fundamental frequency is:
+                            </p>
+                            <div class="bg-slate-50 p-3 rounded-lg border border-slate-300 font-mono text-center">
+                                \(f_0 = \frac{v}{2L} = \frac{1}{2L}\sqrt{\frac{T}{\mu}}\)
+                            </div>
+                            <p>
+                                Harmonics occur at \(f_n = n \cdot f_0\) for integer \(n\), producing \(n\) antinodes.
+                            </p>
+                            <p>
+                                <strong>Heegner condition:</strong> Set \(\frac{T}{\mu} = C = \frac{1+D}{4}\) where \(D\) is a Heegner number. 
+                                Only these 9 ratios produce systems where <strong>all harmonics up to \(n=C\)</strong> 
+                                generate primes—no degenerate interference.
+                            </p>
+                        </div>
+                        <div class="bg-blue-50 p-5 rounded-lg border-2 border-blue-400">
+                            <h4 class="text-lg font-bold text-blue-900 mb-3">Class Number h = 1</h4>
+                            <p class="text-slate-700 text-sm leading-relaxed mb-3">
+                                For Heegner \(D\), the class number \(h(\mathbb{Q}(\sqrt{-D})) = 1\) means:
+                            </p>
+                            <ul class="text-slate-700 text-sm space-y-2 list-disc list-inside">
+                                <li>Every ideal is principal (unique factorization)</li>
+                                <li>No "hidden modes" create degenerate beat frequencies</li>
+                                <li>Standing waves form cleanly at each integer harmonic \(n\)</li>
+                                <li>The polynomial \(n^2 - n + C\) avoids composites until \(n = C\)</li>
+                            </ul>
+                            <p class="text-slate-700 text-sm leading-relaxed mt-3 font-semibold">
+                                Non-Heegner \(D\) have \(h > 1\): multiple ideal classes create "phantom modes" 
+                                that beat against the driven frequency, producing interference patterns (composites) immediately.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FORCED OSCILLATIONS TAB -->
+            <div id="forced" class="tab-content">
+                <h2 class="text-2xl font-bold text-slate-800 mb-4">Forced Oscillations & Modular Arithmetic</h2>
+                
+                <div class="space-y-6">
+                    <div class="bg-gradient-to-r from-green-50 to-teal-50 p-6 rounded-xl border-l-4 border-green-600">
+                        <h3 class="text-xl font-bold text-slate-800 mb-3">The Driven System</h3>
+                        <div class="text-slate-700 space-y-3">
+                            <p>A forced harmonic oscillator obeys:</p>
+                            <div class="bg-white p-4 rounded-lg font-mono text-center text-lg border border-green-200">
+                                \(\frac{d^2x}{dt^2} + \omega_0^2 x = F_0 \cos(\omega t)\)
+                            </div>
+                            <p>
+                                The system responds at the <strong>driving frequency</strong> \(\omega\). If \(\omega \approx \omega_0\) 
+                                (natural frequency), <strong>resonance</strong> occurs—amplitude diverges.
+                            </p>
+                            <p>
+                                <strong>Modular arithmetic analogy:</strong> Consider \(n \bmod C\), where \(C = \frac{1+D}{4}\). 
+                                The polynomial \(f(n) = n^2 - n + C\) cycles through residues. The "forcing term" is the \(+C\) offset.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="bg-white p-5 rounded-xl border border-slate-300 shadow-sm">
+                            <h4 class="text-lg font-bold text-slate-800 mb-3">Resonance at \(n = C\)</h4>
+                            <p class="text-slate-600 text-sm leading-relaxed">
+                                For \(D=163\), \(C=41\). At \(n=41\):
+                            </p>
+                            <div class="bg-slate-100 p-3 rounded font-mono text-center text-sm my-2 border border-slate-300">
+                                \(f(41) = 41^2 - 41 + 41 = 41^2\)
+                            </div>
+                            <p class="text-slate-600 text-sm leading-relaxed">
+                                The system is <strong>resonant</strong>: the natural frequency \(\omega_0 = 41\) matches the driving \(\omega = 41\). 
+                                This produces a <strong>perfect square</strong>, the first forced breakdown into composite.
+                            </p>
+                        </div>
+
+                        <div class="bg-white p-5 rounded-xl border border-slate-300 shadow-sm">
+                            <h4 class="text-lg font-bold text-slate-800 mb-3">Modular Cycles</h4>
+                            <p class="text-slate-600 text-sm leading-relaxed">
+                                Working \(\bmod C\): the sequence \(f(1), f(2), \ldots, f(C)\) explores residue classes. 
+                                For Heegner \(D\), the cycle <strong>avoids zero</strong> (i.e., divisibility by small primes) until \(n=C\).
+                            </p>
+                            <p class="text-slate-600 text-sm mt-3 leading-relaxed">
+                                Non-Heegner \(D\) hit zero residues early—the forced oscillation is immediately <strong>overdamped</strong> 
+                                by modular collisions, producing composites.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl border-2 border-teal-400 shadow-md">
+                        <h4 class="text-xl font-bold text-teal-900 mb-3">Phase Space & Quadratic Reciprocity</h4>
+                        <p class="text-slate-700 leading-relaxed">
+                            In phase space \((n, f(n))\), the trajectory spirals through \(\mathbb{Z}/C\mathbb{Z}\). 
+                            <strong>Quadratic reciprocity</strong> governs when \(f(n) \equiv 0 \pmod{p}\) for primes \(p < C\).
+                        </p>
+                        <p class="text-slate-700 leading-relaxed mt-3">
+                            For Heegner \(D\), the Legendre symbol \(\left(\frac{-D}{p}\right)\) ensures \(f(n)\) avoids 
+                            small prime divisors systematically. The polynomial "steers clear" of modular obstacles.
+                        </p>
+                        <div class="bg-teal-50 p-4 mt-4 rounded-lg border border-teal-200">
+                            <p class="text-sm text-teal-900 italic">
+                                <strong>Example:</strong> For \(D=163\), \(\left(\frac{-163}{p}\right) = -1\) for many small primes \(p\), 
+                                meaning \(x^2 \equiv -163 \pmod{p}\) has no solution. Thus \(n^2 - n + 41 \not\equiv 0 \pmod{p}\) 
+                                for those \(p\), avoiding composites.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-100 p-6 rounded-xl border border-slate-300">
+                        <h4 class="text-lg font-bold text-slate-800 mb-3">Transient vs. Steady State</h4>
+                        <p class="text-slate-700 leading-relaxed">
+                            The initial \(n \ll C\) region is <strong>transient</strong>—the system hasn't reached the forced resonance yet. 
+                            Here, the natural harmonic dominates, and primes flow freely.
+                        </p>
+                        <p class="text-slate-700 leading-relaxed mt-3">
+                            As \(n \to C\), we enter <strong>steady state</strong> where the driving term \(+C\) synchronizes with \(n^2-n\). 
+                            At exact resonance \(n=C\), the amplitude spikes: \(f(C) = C^2\), a composite.
+                        </p>
+                        <p class="text-slate-700 leading-relaxed mt-3 font-semibold">
+                            Beyond \(n > C\), the system is in the "overdamped" regime—composites proliferate as the forcing overpowers 
+                            the natural oscillation. The unique factorization "protection" is lost.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
     </div>
 
     <script>
         const heegnerNumbers = [1, 2, 3, 7, 11, 19, 43, 67, 163];
+        const heegnerC = [0.5, 0.75, 1, 2, 3, 5, 11, 17, 41]; // (1+D)/4 values
         let showNonInteger = false;
-        
+        let animationFrame = null;
+        let time = 0;
+
+        // Melde's string state (T = tension, mu = linear density)
+        const meldeState = {
+            mu: 1.0,      // linear mass density (g/cm)
+            T: 25.0,      // tension (N) from hanging load
+            n: 17,        // driving harmonic number
+            L: 825,       // string length (pixels)
+            amplitude: 60
+        };
+
+        // Tab switching
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById(btn.dataset.tab).classList.add('active');
+                
+                // Start animation if opening dynamics tab
+                if (btn.dataset.tab === 'dynamics') {
+                    if (!animationFrame) startAnimation();
+                } else {
+                    if (animationFrame) {
+                        cancelAnimationFrame(animationFrame);
+                        animationFrame = null;
+                    }
+                }
+                
+                if (window.MathJax) MathJax.typesetPromise();
+            });
+        });
+
+        // Check if current T/mu ratio is Heegner
+        function isHeegnerRatio() {
+            const ratio = meldeState.T / meldeState.mu;
+            return heegnerC.some(c => Math.abs(ratio - c) < 0.3);
+        }
+
+        // Melde's string animation
+        function animate() {
+            const isHeegner = isHeegnerRatio();
+            const ratio = meldeState.T / meldeState.mu; // v^2 = T/mu
+            const omega_0 = Math.sqrt(ratio) * Math.PI / (meldeState.L / 400); // fundamental angular frequency
+            const omega_drive = meldeState.n * omega_0; // driving frequency
+            const n = meldeState.n;
+            
+            const waveString = document.getElementById('waveString');
+            const driver = document.getElementById('driver');
+            const nodeMarkers = document.getElementById('nodeMarkers');
+            const loadMass = document.getElementById('loadMass');
+            const loadString = document.getElementById('loadString');
+            
+            if (!waveString) return;
+
+            let path = 'M 40 200'; // Start from driver
+            const numPoints = 200;
+
+            if (isHeegner) {
+                // STANDING WAVE: y(x,t) = A*sin(n*pi*x/L)*cos(omega*t)
+                for (let i = 0; i <= numPoints; i++) {
+                    const x = 40 + (i / numPoints) * meldeState.L;
+                    const xNorm = (i / numPoints);
+                    const y = 200 + meldeState.amplitude * Math.sin(n * Math.PI * xNorm) * Math.cos(omega_drive * time);
+                    path += ` L ${x} ${y}`;
+                }
+                
+                // Mark nodes
+                if (nodeMarkers) {
+                    nodeMarkers.innerHTML = '';
+                    for (let k = 0; k <= n; k++) {
+                        const nodeX = 40 + (k / n) * meldeState.L;
+                        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                        circle.setAttribute('cx', nodeX);
+                        circle.setAttribute('cy', 200);
+                        circle.setAttribute('r', 6);
+                        circle.setAttribute('fill', '#10b981');
+                        circle.setAttribute('stroke', '#065f46');
+                        circle.setAttribute('stroke-width', 2);
+                        nodeMarkers.appendChild(circle);
+                    }
+                }
+                
+                waveString.setAttribute('stroke', '#10b981');
+                
+            } else {
+                // TRAVELING WAVE BEATS: Superposition with frequency mismatch
+                // Beat pattern: 2A*cos(Δω*t/2)*sin(k*x - ω_avg*t)
+                const delta_omega = omega_drive - omega_0 * n; // frequency mismatch
+                const omega_avg = (omega_drive + omega_0 * n) / 2;
+                const k_wave = n * Math.PI / (meldeState.L / 800);
+                
+                for (let i = 0; i <= numPoints; i++) {
+                    const x = 40 + (i / numPoints) * meldeState.L;
+                    const xNorm = (i / numPoints);
+                    
+                    // Beat envelope modulation
+                    const envelope = Math.abs(Math.cos(delta_omega * time * 0.5));
+                    
+                    // Right-traveling wave
+                    const y_right = Math.sin(k_wave * xNorm * 8 - omega_drive * time);
+                    // Left-traveling wave (reflected)
+                    const y_left = Math.sin(k_wave * xNorm * 8 + omega_drive * time * 0.9);
+                    
+                    // Interference with beat envelope
+                    const y = 200 + meldeState.amplitude * envelope * 0.5 * (y_right + y_left);
+                    
+                    path += ` L ${x} ${y}`;
+                }
+                
+                if (nodeMarkers) {
+                    nodeMarkers.innerHTML = ''; // No fixed nodes
+                }
+                
+                waveString.setAttribute('stroke', '#ef4444');
+            }
+
+            waveString.setAttribute('d', path);
+
+            // Animate driver (left end vibrates)
+            if (driver) {
+                const driverY = 200 + 25 * Math.sin(omega_drive * time);
+                driver.setAttribute('cy', driverY);
+            }
+
+            // Animate load mass (slight oscillation from string tension variations)
+            if (loadMass && loadString) {
+                const loadOscillation = isHeegner ? 2 : 5; // More oscillation in beat mode
+                const loadY = 280 + loadOscillation * Math.sin(omega_drive * time * 0.3);
+                loadMass.setAttribute('y', loadY);
+                loadString.setAttribute('y2', loadY);
+            }
+
+            // Update status
+            const statusText = document.getElementById('statusText');
+            if (statusText) {
+                if (isHeegner) {
+                    statusText.textContent = `STATUS: STANDING WAVE (${n+1} nodes)`;
+                    statusText.setAttribute('fill', '#10b981');
+                } else {
+                    statusText.textContent = 'STATUS: BEAT INTERFERENCE';
+                    statusText.setAttribute('fill', '#ef4444');
+                }
+            }
+
+            time += 0.04;
+            animationFrame = requestAnimationFrame(animate);
+        }
+
+        function startAnimation() {
+            if (!animationFrame) {
+                animate();
+            }
+        }
+
+        function updateSystemValues() {
+            const n = parseInt(document.getElementById('nSlider').value);
+            const mu = parseFloat(document.getElementById('muSlider').value);
+            const T = parseFloat(document.getElementById('tensionSlider').value);
+
+            meldeState.mu = mu;
+            meldeState.T = T;
+            meldeState.n = n;
+
+            const ratio = T / mu;
+            const v = Math.sqrt(ratio);
+
+            document.getElementById('nDisplay').textContent = n;
+            document.getElementById('muDisplay').textContent = mu.toFixed(1);
+            document.getElementById('tensionDisplay').textContent = T.toFixed(1);
+            document.getElementById('cDisplay').textContent = ratio.toFixed(1);
+            document.getElementById('waveVelocity').textContent = `v = √(T/μ) = ${v.toFixed(2)} m/s`;
+        }
+
+        // Event listeners
+        document.getElementById('nSlider')?.addEventListener('input', updateSystemValues);
+        document.getElementById('muSlider')?.addEventListener('input', updateSystemValues);
+        document.getElementById('tensionSlider')?.addEventListener('input', updateSystemValues);
+
+        document.getElementById('presetSelect')?.addEventListener('change', (e) => {
+            const value = e.target.value;
+            if (value !== 'manual') {
+                const D = parseInt(value);
+                const C = (1 + D) / 4;
+                document.getElementById('tensionSlider').value = C;
+                document.getElementById('muSlider').value = 1.0;
+                updateSystemValues();
+            }
+        });
+
+        // 3D Plot
+        function plot3D() {
+            const real = [], imag = [], z = [], text = [];
+            heegnerNumbers.forEach(d => {
+                real.push(0, 0);
+                imag.push(Math.sqrt(d), -Math.sqrt(d));
+                z.push(-d, -d);
+                text.push(`D=${d}, +i√${d}`, `D=${d}, -i√${d}`);
+            });
+
+            const trace = {
+                x: real, y: imag, z: z,
+                mode: 'markers+text',
+                type: 'scatter3d',
+                marker: {
+                    size: 8,
+                    color: z,
+                    colorscale: 'Viridis',
+                    colorbar: { title: '-|D| Depth' },
+                    line: { color: 'black', width: 1 }
+                },
+                text: text,
+                textposition: 'top center',
+                textfont: { size: 10 }
+            };
+
+            const layout = {
+                title: { text: 'Heegner Discriminants on Complex Plane', font: { size: 18 } },
+                scene: {
+                    xaxis: { title: 'Re(x)' },
+                    yaxis: { title: 'Im(x)' },
+                    zaxis: { title: '-|D| (Potential Depth)' },
+                    camera: { eye: { x: 1.5, y: 1.5, z: 1.2 } }
+                },
+                margin: { l: 0, r: 0, t: 40, b: 0 }
+            };
+
+            Plotly.newPlot('plot3d', [trace], layout, { responsive: true });
+        }
+
+        // Prime checking
         function isPrime(num) {
-            if (num <= 1) return false;
-            if (num % 1 !== 0) return false;
+            if (num <= 1 || num % 1 !== 0) return false;
             for (let i = 2; i <= Math.sqrt(num); i++) {
                 if (num % i === 0) return false;
             }
             return true;
         }
 
-        function showTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-            event.currentTarget.classList.add('active');
-            
-            if (tabId === 'preamble') renderPreambleGraph();
-            if (tabId === 'physics') {
-                const c = document.getElementById('oscCanvas');
-                c.width = c.offsetWidth;
-                c.height = c.offsetHeight;
-                updatePhysMath();
-            }
-        }
-
-        // --- Preamble Graph Logic ---
-        function renderPreambleGraph() {
-            const canvas = document.getElementById('preambleGraph');
-            const ctx = canvas.getContext('2d');
-            canvas.width = canvas.offsetWidth;
-            canvas.height = canvas.offsetHeight;
-            
-            const D = parseInt(document.getElementById('preambleDSelector').value);
-            const C = (1 + D) / 4;
-            
-            document.getElementById('metaIntercept').textContent = `f(0) = ${C}`;
-            document.getElementById('metaVertex').textContent = `(0.5, ${(C - 0.25).toFixed(2)})`;
-
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            const padding = 50;
-            const w = canvas.width - 2 * padding;
-            const h = canvas.height - 2 * padding;
-            
-            const xMin = -2, xMax = 4;
-            const yMin = -5, yMax = Math.max(C + 10, 50);
-            
-            const toX = (x) => padding + ((x - xMin) / (xMax - xMin)) * w;
-            const toY = (y) => (canvas.height - padding) - ((y - yMin) / (yMax - yMin)) * h;
-
-            ctx.strokeStyle = '#cbd5e1';
-            ctx.setLineDash([2, 2]);
-            ctx.beginPath();
-            ctx.moveTo(toX(0.5), toY(yMin)); ctx.lineTo(toX(0.5), toY(yMax));
-            ctx.stroke();
-            ctx.setLineDash([]);
-
-            ctx.strokeStyle = '#e2e8f0';
-            ctx.beginPath();
-            ctx.moveTo(toX(xMin), toY(0)); ctx.lineTo(toX(xMax), toY(0));
-            ctx.moveTo(toX(0), toY(yMin)); ctx.lineTo(toX(0), toY(yMax));
-            ctx.stroke();
-
-            ctx.beginPath();
-            ctx.strokeStyle = '#3b82f6';
-            ctx.lineWidth = 3;
-            for (let n = xMin; n <= xMax; n += 0.05) {
-                const val = n * n - n + C;
-                if (n === xMin) ctx.moveTo(toX(n), toY(val));
-                else ctx.lineTo(toX(n), toY(val));
-            }
-            ctx.stroke();
-
-            ctx.fillStyle = '#ef4444';
-            ctx.beginPath(); ctx.arc(toX(0.5), toY(C-0.25), 4, 0, Math.PI * 2); ctx.fill();
-            ctx.fillStyle = '#10b981';
-            ctx.beginPath(); ctx.arc(toX(0), toY(C), 4, 0, Math.PI * 2); ctx.fill();
-        }
-
-        // --- Matrix Tab Logic ---
+        // Matrix table
         function updateTable() {
             const maxN = parseInt(document.getElementById('nRange').value);
             document.getElementById('nValue').textContent = maxN;
-            const headerRow = document.getElementById('tableHeader');
-            const tableBody = document.getElementById('tableBody');
-            
-            headerRow.innerHTML = `
-                <th class="p-4 sticky left-0 bg-slate-50 z-30 min-w-[80px] border-r">D</th>
-                <th class="p-4 sticky left-[80px] bg-slate-50 z-30 min-w-[140px] border-r">C = (1+D)/4</th>
-                ${Array.from({length: maxN}, (_, i) => `<th class="p-2 text-center min-w-[60px] border-r">n=${i+1}</th>`).join('')}
+
+            const header = document.getElementById('tableHeader');
+            const body = document.getElementById('tableBody');
+
+            header.innerHTML = `
+                <th class="p-3 border-r border-slate-300 bg-slate-100 sticky left-0 z-20">D</th>
+                <th class="p-3 border-r border-slate-300 bg-slate-100 sticky left-[60px] z-20">C=(1+D)/4</th>
+                ${Array.from({length: maxN}, (_, i) => `<th class="p-2 text-center border-r border-slate-200">${i+1}</th>`).join('')}
             `;
 
-            tableBody.innerHTML = '';
+            body.innerHTML = '';
             heegnerNumbers.forEach(d => {
-                const constant = (1 + d) / 4;
+                const C = (1 + d) / 4;
+                const isNonInt = (d === 1 || d === 2);
+                if (isNonInt && !showNonInteger) return;
+
                 const row = document.createElement('tr');
-                row.className = `border-b border-slate-100 hover:bg-slate-50 transition-colors ${ (d === 1 || d === 2) && !showNonInteger ? 'collapsed' : ''}`;
+                row.className = 'border-b border-slate-100 hover:bg-slate-50';
                 
-                let cellsHtml = `<td class="p-4 font-bold sticky left-0 bg-white z-20 border-r">${d}</td><td class="p-4 font-mono text-slate-500 sticky left-[80px] bg-white z-20 border-r">${constant}</td>`;
+                let html = `
+                    <td class="p-3 font-bold border-r border-slate-300 bg-white sticky left-0 z-10">${d}</td>
+                    <td class="p-3 font-mono text-slate-600 border-r border-slate-300 bg-white sticky left-[60px] z-10">${C}</td>
+                `;
 
                 for (let n = 1; n <= maxN; n++) {
-                    const val = (n * n) - n + constant;
-                    const isP = isPrime(Math.round(val * 100) / 100);
+                    const val = n*n - n + C;
+                    const isP = isPrime(val);
                     const isInt = (val % 1 === 0);
-                    const cellClass = isInt ? (isP ? 'prime-cell' : 'composite-cell') : 'text-slate-400 italic bg-slate-50';
-                    cellsHtml += `<td class="p-2 text-center border-r border-slate-100 ${cellClass}">${val}</td>`;
+                    let cls = isInt ? (isP ? 'prime-cell' : 'composite-cell') : 'text-slate-400 italic bg-slate-50';
+                    html += `<td class="p-2 text-center border-r border-slate-100 ${cls}">${val}</td>`;
                 }
-                row.innerHTML = cellsHtml;
-                tableBody.appendChild(row);
+
+                row.innerHTML = html;
+                body.appendChild(row);
             });
+
             if (window.MathJax) MathJax.typesetPromise();
         }
 
-        // --- Physics Tab Logic ---
-        const labCanvas = document.getElementById('oscCanvas');
-        const labCtx = labCanvas.getContext('2d');
-        const nPhysSlider = document.getElementById('nPhysSlider');
-        const mPhysSlider = document.getElementById('mPhysSlider');
-        const kPhysSlider = document.getElementById('kPhysSlider');
-        const physCSelector = document.getElementById('physCSelector');
-        
-        function updatePhysMath() {
-            const m = parseFloat(mPhysSlider.value);
-            const k = parseFloat(kPhysSlider.value);
-            const C = k / m;
-            const omega = Math.sqrt(C);
-            const freq = omega / (2 * Math.PI);
-            const period = 1 / freq;
+        document.getElementById('toggleCollapsed')?.addEventListener('click', () => {
+            showNonInteger = !showNonInteger;
+            document.getElementById('toggleCollapsed').textContent = 
+                showNonInteger ? 'Hide Non-Integer C' : 'Show Non-Integer C (D=1,2)';
+            updateTable();
+        });
 
-            document.getElementById('mValDisplay').textContent = m.toFixed(1);
-            document.getElementById('kValDisplay').textContent = k.toFixed(1);
-            document.getElementById('ratioDisplay').textContent = C.toFixed(1);
-            
-            document.getElementById('liveFreq').textContent = freq.toFixed(2) + " Hz";
-            document.getElementById('livePeriod').textContent = period.toFixed(2) + " s";
-            
-            const liveMathEl = document.getElementById('liveMathPhys');
-            liveMathEl.innerHTML = `$$ \\omega_n = \\sqrt{\\frac{${k}}{${m}}} \\approx ${omega.toFixed(2)} \\, \\text{rad/s} $$`;
-            if (window.MathJax) MathJax.typesetPromise([liveMathEl]);
-        }
-
-        let labTime = 0;
-        function animatePhysics() {
-            if (!document.getElementById('physics').classList.contains('active')) {
-                requestAnimationFrame(animatePhysics);
-                return;
-            }
-
-            labCtx.clearRect(0, 0, labCanvas.width, labCanvas.height);
-            const n = parseInt(nPhysSlider.value);
-            const m = parseFloat(mPhysSlider.value);
-            const k = parseFloat(kPhysSlider.value);
-            const C = k / m;
-            
-            const result = (n * n) - n + C;
-            const isP = isPrime(result);
-
-            document.getElementById('nPhysDisp').textContent = n;
-            
-            const omega = Math.sqrt(C); 
-            const centerY = labCanvas.height / 2;
-            const centerX = labCanvas.width / 2;
-            const amp = 40;
-            const currentY = centerY + amp * Math.cos(omega * labTime);
-
-            // Draw Mechanical System
-            labCtx.beginPath();
-            labCtx.strokeStyle = '#475569';
-            labCtx.lineWidth = 2;
-            labCtx.moveTo(centerX - 120, 0);
-            for(let i=0; i<=20; i++) {
-                labCtx.lineTo(centerX - 120 + (i%2 ? 10 : -10), (currentY / 20) * i);
-            }
-            labCtx.stroke();
-            labCtx.fillStyle = '#3b82f6';
-            // Size of mass scales with 'm'
-            const massRadius = 10 + (m * 2);
-            labCtx.beginPath(); labCtx.arc(centerX - 120, currentY, massRadius, 0, Math.PI*2); labCtx.fill();
-
-            // Draw Wave Pattern
-            const waveX = centerX - 40;
-            const waveW = labCanvas.width - waveX - 40;
-            
-            const resonanceThreshold = 0.01;
-            document.getElementById('stateLabel').textContent = isP ? `STABLE RESONANCE` : `WAVE INTERFERENCE`;
-            document.getElementById('stateLabel').className = isP ? 'text-emerald-400 font-bold' : 'text-red-400 font-bold';
-
-            labCtx.beginPath();
-            labCtx.strokeStyle = isP ? '#10b981' : '#ef4444';
-            labCtx.lineWidth = isP ? 3 : 1;
-            for(let x=0; x<waveW; x++) {
-                const p = x / waveW;
-                const harmonic = Math.sin(n * Math.PI * p);
-                const phase = Math.cos(omega * labTime);
-                let y = centerY + (amp * 1.5) * harmonic * phase;
-                
-                if(!isP) {
-                    y += (Math.random()-0.5) * 15;
-                }
-                
-                if(x===0) labCtx.moveTo(waveX+x, y);
-                else labCtx.lineTo(waveX+x, y);
-            }
-            labCtx.stroke();
-
-            labTime += 0.05;
-            requestAnimationFrame(animatePhysics);
-        }
+        document.getElementById('nRange')?.addEventListener('input', updateTable);
 
         window.onload = () => {
-            renderPreambleGraph();
+            // Wait for Plotly to load
+            const checkPlotly = setInterval(() => {
+                if (typeof Plotly !== 'undefined') {
+                    clearInterval(checkPlotly);
+                    plot3D();
+                }
+            }, 100);
+            
             updateTable();
-            animatePhysics();
-        };
-
-        document.getElementById('preambleDSelector').addEventListener('change', renderPreambleGraph);
-        document.getElementById('nRange').addEventListener('input', updateTable);
-        
-        mPhysSlider.addEventListener('input', () => {
-            physCSelector.value = 'manual';
-            updatePhysMath();
-        });
-        kPhysSlider.addEventListener('input', () => {
-            physCSelector.value = 'manual';
-            updatePhysMath();
-        });
-
-        document.getElementById('physCSelector').addEventListener('change', (e) => {
-            if (e.target.value !== 'manual') {
-                const val = parseFloat(e.target.value);
-                mPhysSlider.value = 1.0;
-                kPhysSlider.value = val;
-                updatePhysMath();
-            }
-        });
-
-        document.getElementById('toggleCollapsed').addEventListener('click', (e) => {
-            showNonInteger = !showNonInteger;
-            e.target.textContent = showNonInteger ? 'Hide D = 1, 2' : 'Show D = 1, 2';
-            updateTable();
-        });
-
-        window.onresize = () => {
-            renderPreambleGraph();
-            labCanvas.width = labCanvas.offsetWidth;
-            labCanvas.height = labCanvas.offsetHeight;
+            if (window.MathJax) MathJax.typesetPromise();
         };
     </script>
 </body>
 </html>
+
 
 
 
