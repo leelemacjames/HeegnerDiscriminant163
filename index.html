@@ -13,148 +13,261 @@
             scrollbar-width: thin;
             scrollbar-color: #cbd5e1 #f8fafc;
         }
-        .ascii-tagline {
-            font-family: monospace;
-            white-space: pre;
-            line-height: 1.2;
-            color: #1e293b;
-        }
         tr.collapsed { display: none; }
-        .toggle-btn { transition: all 0.2s; }
-        .toggle-btn:hover { transform: translateY(-1px); }
-        canvas { border-radius: 0.75rem; background: #0f172a; width: 100%; height: 300px; }
-        .math-block { background: #f1f5f9; padding: 1rem; border-radius: 0.5rem; font-family: serif; }
+        .lab-canvas { border-radius: 0.75rem; background: #0f172a; width: 100%; height: 350px; }
+        .preamble-canvas { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 0.5rem; width: 100%; height: 320px; }
+        .math-block { background: #f1f5f9; padding: 1.25rem; border-radius: 0.5rem; font-family: serif; border-left: 4px solid #3b82f6; }
+        .preamble-plate { background: linear-gradient(to right, #ffffff, #f8fafc); border: 2px solid #e2e8f0; border-radius: 1rem; overflow: hidden; }
+        
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .tab-btn.active { border-bottom: 3px solid #3b82f6; color: #3b82f6; }
+
+        input[type=range] { cursor: pointer; }
     </style>
 </head>
 <body class="bg-slate-50 min-height-screen p-4 md:p-8">
     <div class="max-w-7xl mx-auto">
-        <header class="mb-8 text-center">
-            <div class="flex flex-col items-center justify-center mb-6">
-                <div class="ascii-tagline text-[10px] md:text-xs bg-slate-100 p-4 rounded-lg border border-slate-200 shadow-inner">
-  _    _                               _   _                      _               
- | |  | |                             | \ | |                    | |              
- | |__| | ___  ___  __ _ _ __   ___ _ _|  \| |_   _ _ __ ___ | |__   ___ _ __ ___ 
- |  __  |/ _ \/ _ \/ _` | '_ \ / _ \ '__| . ` | | | | '_ ` _ \| '_ \ / _ \ '__/ __|
- | |  | |  __/  __/ (_| | | | |  __/ |  | |\  | |_| | | | | | | |_) |  __/ |  \__ \
- |_|  |_|\___|\___|\__, |_| |_|\___|_|  |_| \_|\__,_|_| |_| |_|_.__/ \___|_|  |___/
-                    __/ |                                                         
-                   |___/                                                          
-                </div>
-                <p class="mt-4 text-lg font-medium text-slate-700 max-w-2xl">
-                    The 9 Magic Numbers of Class Number 1: Where Algebra ensures Prime Perfection.
-                </p>
+        
+        <header class="mb-6 flex flex-col md:flex-row justify-between items-end gap-4 border-b pb-6">
+            <div>
+                <h1 class="text-3xl font-black text-slate-800 tracking-tight">HEEGNER<span class="text-blue-600">LAB</span></h1>
+                <p class="text-slate-500 font-medium">Algebraic Landscapes & Harmonic Primes</p>
             </div>
+            <nav class="flex gap-1 bg-slate-200 p-1 rounded-lg">
+                <button onclick="showTab('preamble')" class="tab-btn active px-4 py-2 text-sm font-bold rounded-md transition-all">1. Preamble</button>
+                <button onclick="showTab('matrix')" class="tab-btn px-4 py-2 text-sm font-bold rounded-md transition-all">2. Matrix</button>
+                <button onclick="showTab('physics')" class="tab-btn px-4 py-2 text-sm font-bold rounded-md transition-all">3. Physics</button>
+            </nav>
         </header>
 
-        <!-- Matrix Controls -->
-        <div class="bg-white p-6 rounded-xl shadow-sm mb-8 flex flex-wrap gap-6 items-center justify-center border border-slate-200">
-            <div class="flex flex-col">
-                <label class="text-sm font-semibold text-slate-700 mb-1">Max \(n\) (Integer Steps):</label>
-                <input type="range" id="nRange" min="5" max="50" value="45" class="w-64 accent-blue-600">
-                <span id="nValue" class="text-center font-mono text-blue-600 font-bold text-lg">45</span>
+        <!-- TAB 1: PREAMBLE PLATE -->
+        <div id="preamble" class="tab-content active animate-in fade-in duration-500">
+            <div class="preamble-plate shadow-xl">
+                <div class="bg-slate-800 text-white p-4 flex justify-between items-center">
+                    <h2 class="font-bold tracking-widest text-sm uppercase">Geometry of the Euler Class</h2>
+                    <div class="flex items-center gap-4">
+                        <select id="preambleDSelector" class="bg-slate-700 text-white text-xs p-1 rounded border border-slate-600 outline-none">
+                            <option value="163">D=163 (C=41)</option>
+                            <option value="67">D=67 (C=17)</option>
+                            <option value="43">D=43 (C=11)</option>
+                            <option value="19">D=19 (C=5)</option>
+                            <option value="11">D=11 (C=3)</option>
+                            <option value="7">D=7 (C=2)</option>
+                            <option value="3">D=3 (C=1)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="p-8 grid lg:grid-cols-2 gap-12 items-start">
+                    <div class="space-y-6">
+                        <h3 class="text-2xl font-bold text-slate-800">The Quadratic Bridge</h3>
+                        <div class="bg-blue-50 p-6 rounded-xl border border-blue-100 font-mono text-xs space-y-4 shadow-inner">
+                            <div>
+                                <span class="text-blue-400">// 1. Standard Form</span><br>
+                                \( f(n) = an^2 + bx + c \) where \( a=1, b=-1, c=C \)
+                            </div>
+                            <div>
+                                <span class="text-blue-400">// 2. The Discriminant Rule</span><br>
+                                \( \Delta = b^2 - 4ac = (-1)^2 - 4(1)(C) = 1 - 4C \)
+                            </div>
+                            <div>
+                                <span class="text-blue-400">// 3. Roots via Quadratic Formula</span><br>
+                                \( n = \frac{-(-1) \pm \sqrt{1 - 4C}}{2(1)} = \frac{1 \pm \sqrt{-D}}{2} \)
+                            </div>
+                            <div class="text-blue-700 font-bold bg-blue-100 p-2 rounded">
+                                CONCLUSION: If \( D > 0 \), roots are complex. The graph never touches the x-axis.
+                            </div>
+                        </div>
+                        <div class="math-block">
+                            <p class="font-bold text-blue-900 mb-2">Pedagogical Note: Vertex & Symmetry</p>
+                            <p class="text-sm text-slate-700">
+                                The polynomial \( n^2 - n + C \) is symmetrical about \( n = 0.5 \). 
+                                We study the range \( n \in [0, C-1] \). For Heegner numbers, this entire integer range results in prime values.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="relative">
+                            <canvas id="preambleGraph" class="preamble-canvas shadow-inner"></canvas>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 bg-slate-100 p-3 rounded-lg border border-slate-200">
+                           <div class="text-[10px] font-bold text-slate-500 uppercase">
+                               Axis: <span id="metaAxis" class="text-slate-800">n = 0.5</span>
+                           </div>
+                           <div class="text-[10px] font-bold text-slate-500 uppercase text-right">
+                               Intercept: <span id="metaIntercept" class="text-slate-800">f(0) = 41</span>
+                           </div>
+                           <div class="text-[10px] font-bold text-slate-500 uppercase">
+                               Vertex: <span id="metaVertex" class="text-slate-800">(0.5, 40.75)</span>
+                           </div>
+                           <div class="text-[10px] font-bold text-slate-500 uppercase text-right">
+                               Class No: <span class="text-blue-600">h(-D) = 1</span>
+                           </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="flex flex-col items-center border-l px-6 border-slate-200">
-                <button id="toggleCollapsed" class="toggle-btn bg-slate-800 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-sm hover:bg-slate-700 mb-2">
+        </div>
+
+        <!-- TAB 2: MATRIX -->
+        <div id="matrix" class="tab-content animate-in fade-in duration-500">
+            <div class="bg-white p-6 rounded-xl shadow-sm mb-6 flex flex-wrap gap-6 items-center border border-slate-200">
+                <div class="flex flex-col">
+                    <label class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Complexity Horizon (n):</label>
+                    <input type="range" id="nRange" min="5" max="50" value="45" class="w-48 accent-blue-600">
+                    <span id="nValue" class="text-blue-600 font-mono font-bold text-lg">45</span>
+                </div>
+                <button id="toggleCollapsed" class="toggle-btn bg-slate-100 text-slate-700 px-4 py-2 rounded-lg text-xs font-bold border hover:bg-slate-200">
                     Show Non-Integer D (1, 2)
                 </button>
             </div>
-            <div class="text-sm text-slate-500 border-l pl-6 border-slate-200">
-                <p>Heegner Prime Generator: \( f(n) = n^2 - n + C \)</p>
-                <p class="text-xs text-blue-600 italic">For \( D=163 \), \( C=41 \) and primes persist for \( n=1..40 \)</p>
+
+            <div class="overflow-x-auto bg-white rounded-xl shadow-md border border-slate-200 table-scroll mb-8">
+                <table class="w-full text-sm text-left border-collapse">
+                    <thead><tr id="tableHeader" class="bg-slate-50 border-b border-slate-200"></tr></thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
             </div>
-        </div>
 
-        <!-- Table -->
-        <div class="overflow-x-auto bg-white rounded-xl shadow-md border border-slate-200 table-scroll mb-12">
-            <table class="w-full text-sm text-left border-collapse">
-                <thead><tr id="tableHeader" class="bg-slate-100 border-b border-slate-200"></tr></thead>
-                <tbody id="tableBody"></tbody>
-            </table>
-        </div>
-
-        <!-- Physics Lab -->
-        <div class="bg-white p-8 rounded-xl shadow-md border border-slate-200 mb-12">
-            <h2 class="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-2">
-                <span class="p-2 bg-blue-100 rounded-lg">⚙️</span>
-                The Heegner Oscillator & Standing Waves
-            </h2>
-
-            <div class="grid lg:grid-cols-2 gap-10">
-                <div class="space-y-6">
-                    <div class="math-block">
-                        <p class="font-bold text-blue-800 mb-2">Differential Equation (SHM):</p>
-                        \[ m \frac{d^2x}{dt^2} + kx = 0 \]
-                        <p class="mt-2 text-sm">Solution: \( x(t) = A \cos(\omega t) \)</p>
-                        <p class="text-sm">Angular Frequency: \( \omega = \sqrt{k/m} = 2\pi f \)</p>
-                        <p class="text-sm">Period: \( T = 1/f = 2\pi \sqrt{m/k} \)</p>
-                    </div>
-
-                    <div class="space-y-4 bg-slate-50 p-6 rounded-lg border border-slate-100">
-                        <div>
-                            <label class="block text-sm font-bold text-slate-700 mb-2">Mass (\(m\)) [kg]: <span id="mDisp" class="text-blue-600">1.0</span></label>
-                            <input type="range" id="mSlider" min="0.2" max="4" step="0.1" value="1" class="w-full accent-blue-600">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-bold text-slate-700 mb-2">Stiffness (\(k\)) [N/m]: <span id="kDisp" class="text-emerald-600">41.0</span></label>
-                            <input type="range" id="kSlider" min="1" max="200" step="1" value="41" class="w-full accent-emerald-600">
-                        </div>
-                        <div class="grid grid-cols-2 gap-4 pt-4 border-t text-sm font-mono">
-                            <div>\(\omega\): <span id="omegaVal" class="font-bold">0</span></div>
-                            <div>\(f\): <span id="fVal" class="font-bold">0</span></div>
-                            <div>\(T\): <span id="tVal" class="font-bold">0</span></div>
-                            <div>\(k/m\): <span id="ratioVal" class="font-bold">0</span></div>
-                        </div>
-                        <button id="preset163" class="w-full bg-blue-600 text-white py-2 rounded font-bold hover:bg-blue-700 transition shadow-sm">
-                            Snap to Heegner \(D=163\) (\(k=41m\))
-                        </button>
-                    </div>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="bg-amber-50 p-6 rounded-xl border border-amber-100">
+                    <h4 class="font-bold text-amber-900 mb-2 flex items-center gap-2">
+                        <span>💡</span> The Counter Example: D = 5
+                    </h4>
+                    <p class="text-sm text-amber-800 leading-relaxed">
+                        Why aren't all numbers Heegner? Take \( D=5 \). Then \( C = (1+5)/4 = 1.5 \). 
+                        The polynomial \( n^2 - n + 1.5 \) doesn't even produce integers. Even for non-Heegner integers like \( D=13 \) where \( C=4 \), the polynomial \( n^2 - n + 4 \) fails immediately at \( n=4 \) (\(16-4+4=16\), composite). Heegner numbers are the <strong>only</strong> nine integers where the class number of \( \mathbb{Q}(\sqrt{-D}) \) is 1.
+                    </p>
                 </div>
-
-                <div class="space-y-4">
-                    <div class="relative">
-                        <canvas id="oscCanvas"></canvas>
-                        <div class="absolute top-4 left-4 bg-black/50 text-white p-2 rounded text-xs font-mono">
-                            SHM Vibration & Harmonic Primes
-                        </div>
-                    </div>
-                    <div class="p-4 bg-amber-50 rounded-lg border border-amber-100 text-xs text-amber-900">
-                        <strong>Pedagogical Insight:</strong> The standing wave visualization shows the "Heegner String". 
-                        The number of nodes corresponds to \(n\). Stable green waves indicate a Prime outcome (Harmonic symmetry). 
-                        Red jagged waves indicate a Composite outcome (Broken symmetry).
-                    </div>
+                <div class="bg-indigo-50 p-6 rounded-xl border border-indigo-100">
+                    <h4 class="font-bold text-indigo-900 mb-2 flex items-center gap-2">
+                        <span>✨</span> Ramanujan's Constant
+                    </h4>
+                    <p class="text-sm text-indigo-800 leading-relaxed">
+                        For the largest Heegner number \( D=163 \), the value \( e^{\pi\sqrt{163}} \) is "almost" an integer: 
+                        <span class="block mt-2 font-mono bg-white/50 p-2 rounded text-center">
+                            262,537,412,640,768,743.99999999999925...
+                        </span>
+                        This deep coincidence links modular forms, elliptic curves, and the very primes you see in the matrix above.
+                    </p>
                 </div>
             </div>
         </div>
 
-        <!-- Footnotes -->
-        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 border-t-4 border-t-indigo-500">
-                <h2 class="text-lg font-bold text-slate-800 mb-3 border-b pb-2">Ramanujan's Constant</h2>
-                <div class="text-slate-600 space-y-3 text-sm">
-                    <p>\( e^{\pi\sqrt{163}} \approx 262537412640768743.999... \)</p>
-                    <p>When \(D=163\), the field has <strong>Class Number 1</strong>, ensuring nearly perfect integer alignment.</p>
+        <!-- TAB 3: PHYSICS -->
+        <div id="physics" class="tab-content animate-in fade-in duration-500">
+            <div class="bg-white p-8 rounded-xl shadow-md border border-slate-200">
+                <div class="grid lg:grid-cols-2 gap-10">
+                    <div class="space-y-6">
+                        <div class="math-block">
+                            <h3 class="text-xl font-bold text-slate-800 mb-4">Manual Resonance Tuning</h3>
+                            <div class="space-y-6">
+                                <div>
+                                    <div class="flex justify-between mb-1">
+                                        <label class="text-xs font-bold text-slate-500 uppercase">Tuning Step (Harmonic n)</label>
+                                        <span id="nPhysDisp" class="text-blue-600 font-mono font-bold">1</span>
+                                    </div>
+                                    <input type="range" id="nPhysSlider" min="1" max="40" step="1" value="1" class="w-full accent-blue-600">
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="space-y-2">
+                                        <div class="flex justify-between">
+                                            <label class="text-xs font-bold text-slate-500 uppercase">Mass (m)</label>
+                                            <span id="mValDisplay" class="text-blue-600 font-mono font-bold">1.0</span>
+                                        </div>
+                                        <input type="range" id="mPhysSlider" min="0.5" max="10" step="0.5" value="1" class="w-full accent-slate-600">
+                                    </div>
+                                    <div class="space-y-2">
+                                        <div class="flex justify-between">
+                                            <label class="text-xs font-bold text-slate-500 uppercase">Spring (k)</label>
+                                            <span id="kValDisplay" class="text-blue-600 font-mono font-bold">41.0</span>
+                                        </div>
+                                        <input type="range" id="kPhysSlider" min="1" max="100" step="1" value="41" class="w-full accent-blue-600">
+                                    </div>
+                                </div>
+
+                                <div class="p-4 bg-slate-50 rounded border-dashed border-2 border-slate-200 text-center">
+                                    <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Ratio \( k/m \) (Effective Prime Constant C)</p>
+                                    <span id="ratioDisplay" class="text-2xl font-black text-slate-700 font-mono">41.0</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-5 bg-slate-50 p-6 rounded-xl border border-slate-100">
+                            <label class="text-sm font-bold text-slate-700">Preset Prime Field Potential (C)</label>
+                            <select id="physCSelector" class="w-full p-3 bg-white border border-slate-300 rounded-lg font-bold">
+                                <option value="41">Euler Prime Field (C=41)</option>
+                                <option value="17">D=67 (C=17)</option>
+                                <option value="11">D=43 (C=11)</option>
+                                <option value="5">D=19 (C=5)</option>
+                                <option value="3">D=11 (C=3)</option>
+                                <option value="1.5">D=5 (Counter Example C=1.5)</option>
+                                <option value="manual" disabled>-- Manual Tuning Active --</option>
+                            </select>
+                            <p class="text-[10px] text-slate-400 italic">Changing m or k manually will override these presets.</p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <canvas id="oscCanvas" class="lab-canvas"></canvas>
+                        <div id="physMonitor" class="p-4 bg-blue-900 text-blue-100 rounded-xl text-[10px] font-mono shadow-lg flex justify-between items-center">
+                            <div>
+                                STATUS: <span id="stateLabel" class="text-emerald-400 font-bold">STABLE RESONANCE</span>
+                            </div>
+                            <div class="text-blue-300">k/m Phase Alignment</div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 border-t-4 border-t-red-500">
-                <h2 class="text-lg font-bold text-slate-800 mb-3 border-b pb-2">Broken Symmetry</h2>
-                <div class="text-slate-600 space-y-3 text-sm">
-                    <p>For non-Heegner numbers like \(D=5\), unique factorization fails: \(6 = 2 \cdot 3 = (1+\sqrt{-5})(1-\sqrt{-5})\).</p>
-                </div>
-            </div>
-            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
-                <h2 class="text-lg font-bold text-slate-800 mb-3 border-b pb-2">Frequency Map</h2>
-                <div class="text-slate-600 space-y-3 text-sm italic">
-                    <p>In this model, the prime generator's constant is the squared natural frequency of the vacuum.</p>
-                </div>
-            </div>
-            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 border-t-4 border-t-emerald-500">
-                <h2 class="text-lg font-bold text-slate-800 mb-3 border-b pb-2">Euler's Primes</h2>
-                <div class="text-slate-600 space-y-3 text-sm">
-                    <p>\(41, 43, 47, 53, 61, 71, 83...\)</p>
-                    <p>The sequence stays prime as long as the underlying algebraic field is a Principal Ideal Domain.</p>
+
+                <!-- Differential Equation Post-Amble -->
+                <div class="mt-10 border-t pt-8">
+                    <h3 class="text-2xl font-bold text-slate-800 mb-6">Harmonic Mechanics & Prime Stability</h3>
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div class="math-block">
+                            <p class="font-bold text-slate-900 mb-2 underline">The Governing Equation</p>
+                            <p class="text-sm mb-4">The spring-mass system follows the homogeneous second-order differential equation:</p>
+                            <div id="mathODE" class="text-lg bg-white/50 p-4 rounded text-center">
+                                $$ m \ddot{x} + kx = 0 $$
+                            </div>
+                            <p class="text-[11px] text-slate-600 mt-4">
+                                This leads to a natural frequency defined solely by the system properties:
+                                <span class="block text-center py-2 font-bold text-blue-700">$$ \omega_n = \sqrt{\frac{k}{m}} $$</span>
+                                Where cyclic frequency is \( f = \frac{\omega_n}{2\pi} \) and the period is \( T = \frac{1}{f} = 2\pi\sqrt{\frac{m}{k}} \).
+                            </p>
+                        </div>
+                        <div class="bg-slate-800 text-white p-6 rounded-xl shadow-inner">
+                            <p class="text-blue-400 font-bold mb-2 uppercase text-xs tracking-widest">Active System Expression</p>
+                            <div id="liveMathPhys" class="font-serif text-xl mb-4 py-2 border-b border-slate-700 text-center">
+                                $$ \omega_n = \sqrt{\frac{41}{1}} \approx 6.40 \, \text{rad/s} $$
+                            </div>
+                            <div class="grid grid-cols-2 gap-4 text-[11px]">
+                                <div class="bg-slate-700/50 p-3 rounded">
+                                    <p class="text-blue-300 font-bold mb-1">Frequency (f)</p>
+                                    <span id="liveFreq">1.02 Hz</span>
+                                </div>
+                                <div class="bg-slate-700/50 p-3 rounded">
+                                    <p class="text-blue-300 font-bold mb-1">Period (T)</p>
+                                    <span id="livePeriod">0.98 s</span>
+                                </div>
+                            </div>
+                            <div class="mt-4 space-y-2 text-xs opacity-80">
+                                <p><strong>Characteristic Equation:</strong> \( r^2 + \frac{k}{m} = 0 \)</p>
+                                <p><strong>General Solution:</strong> \( x(t) = A \cos(\omega_n t) + B \sin(\omega_n t) \)</p>
+                                <p><strong>Resonance:</strong> Alignment occurs when the system energy maps to a Heegner Prime.</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
+
+        <footer class="mt-12 pt-8 border-t border-slate-200 grid md:grid-cols-3 gap-8 text-slate-400 text-[10px] uppercase tracking-widest pb-12">
+            <div><strong>Identity:</strong> \( n^2 - n + C \)</div>
+            <div class="text-center font-mono opacity-50">HEEGNER LAB ARCHIVE // 2026</div>
+            <div class="text-right"><strong>Roots:</strong> \( \frac{1 \pm i\sqrt{D}}{2} \)</div>
+        </footer>
     </div>
 
     <script>
@@ -170,17 +283,85 @@
             return true;
         }
 
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
+            
+            if (tabId === 'preamble') renderPreambleGraph();
+            if (tabId === 'physics') {
+                const c = document.getElementById('oscCanvas');
+                c.width = c.offsetWidth;
+                c.height = c.offsetHeight;
+                updatePhysMath();
+            }
+        }
+
+        // --- Preamble Graph Logic ---
+        function renderPreambleGraph() {
+            const canvas = document.getElementById('preambleGraph');
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            
+            const D = parseInt(document.getElementById('preambleDSelector').value);
+            const C = (1 + D) / 4;
+            
+            document.getElementById('metaIntercept').textContent = `f(0) = ${C}`;
+            document.getElementById('metaVertex').textContent = `(0.5, ${(C - 0.25).toFixed(2)})`;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const padding = 50;
+            const w = canvas.width - 2 * padding;
+            const h = canvas.height - 2 * padding;
+            
+            const xMin = -2, xMax = 4;
+            const yMin = -5, yMax = Math.max(C + 10, 50);
+            
+            const toX = (x) => padding + ((x - xMin) / (xMax - xMin)) * w;
+            const toY = (y) => (canvas.height - padding) - ((y - yMin) / (yMax - yMin)) * h;
+
+            ctx.strokeStyle = '#cbd5e1';
+            ctx.setLineDash([2, 2]);
+            ctx.beginPath();
+            ctx.moveTo(toX(0.5), toY(yMin)); ctx.lineTo(toX(0.5), toY(yMax));
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            ctx.strokeStyle = '#e2e8f0';
+            ctx.beginPath();
+            ctx.moveTo(toX(xMin), toY(0)); ctx.lineTo(toX(xMax), toY(0));
+            ctx.moveTo(toX(0), toY(yMin)); ctx.lineTo(toX(0), toY(yMax));
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.strokeStyle = '#3b82f6';
+            ctx.lineWidth = 3;
+            for (let n = xMin; n <= xMax; n += 0.05) {
+                const val = n * n - n + C;
+                if (n === xMin) ctx.moveTo(toX(n), toY(val));
+                else ctx.lineTo(toX(n), toY(val));
+            }
+            ctx.stroke();
+
+            ctx.fillStyle = '#ef4444';
+            ctx.beginPath(); ctx.arc(toX(0.5), toY(C-0.25), 4, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = '#10b981';
+            ctx.beginPath(); ctx.arc(toX(0), toY(C), 4, 0, Math.PI * 2); ctx.fill();
+        }
+
+        // --- Matrix Tab Logic ---
         function updateTable() {
             const maxN = parseInt(document.getElementById('nRange').value);
             document.getElementById('nValue').textContent = maxN;
             const headerRow = document.getElementById('tableHeader');
             const tableBody = document.getElementById('tableBody');
             
-            // Fixed the header column to use ASCII (1+D)/4 for legibility
             headerRow.innerHTML = `
-                <th class="p-4 sticky left-0 bg-slate-100 z-30 min-w-[100px]">D</th>
-                <th class="p-4 sticky left-[100px] bg-slate-100 z-30 min-w-[140px]">C = (1+D)/4</th>
-                ${Array.from({length: maxN}, (_, i) => `<th class="p-2 text-center min-w-[60px]">n=${i+1}</th>`).join('')}
+                <th class="p-4 sticky left-0 bg-slate-50 z-30 min-w-[80px] border-r">D</th>
+                <th class="p-4 sticky left-[80px] bg-slate-50 z-30 min-w-[140px] border-r">C = (1+D)/4</th>
+                ${Array.from({length: maxN}, (_, i) => `<th class="p-2 text-center min-w-[60px] border-r">n=${i+1}</th>`).join('')}
             `;
 
             tableBody.innerHTML = '';
@@ -189,11 +370,11 @@
                 const row = document.createElement('tr');
                 row.className = `border-b border-slate-100 hover:bg-slate-50 transition-colors ${ (d === 1 || d === 2) && !showNonInteger ? 'collapsed' : ''}`;
                 
-                let cellsHtml = `<td class="p-4 font-bold sticky left-0 bg-white z-20">${d}</td><td class="p-4 font-mono text-slate-500 sticky left-[100px] bg-white z-20">${constant}</td>`;
+                let cellsHtml = `<td class="p-4 font-bold sticky left-0 bg-white z-20 border-r">${d}</td><td class="p-4 font-mono text-slate-500 sticky left-[80px] bg-white z-20 border-r">${constant}</td>`;
 
                 for (let n = 1; n <= maxN; n++) {
                     const val = (n * n) - n + constant;
-                    const isP = isPrime(val);
+                    const isP = isPrime(Math.round(val * 100) / 100);
                     const isInt = (val % 1 === 0);
                     const cellClass = isInt ? (isP ? 'prime-cell' : 'composite-cell') : 'text-slate-400 italic bg-slate-50';
                     cellsHtml += `<td class="p-2 text-center border-r border-slate-100 ${cellClass}">${val}</td>`;
@@ -204,109 +385,139 @@
             if (window.MathJax) MathJax.typesetPromise();
         }
 
-        const canvas = document.getElementById('oscCanvas');
-        const ctx = canvas.getContext('2d');
-        const mSlider = document.getElementById('mSlider');
-        const kSlider = document.getElementById('kSlider');
-        const nRange = document.getElementById('nRange');
+        // --- Physics Tab Logic ---
+        const labCanvas = document.getElementById('oscCanvas');
+        const labCtx = labCanvas.getContext('2d');
+        const nPhysSlider = document.getElementById('nPhysSlider');
+        const mPhysSlider = document.getElementById('mPhysSlider');
+        const kPhysSlider = document.getElementById('kPhysSlider');
+        const physCSelector = document.getElementById('physCSelector');
         
-        let time = 0;
-        function animate() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        function updatePhysMath() {
+            const m = parseFloat(mPhysSlider.value);
+            const k = parseFloat(kPhysSlider.value);
+            const C = k / m;
+            const omega = Math.sqrt(C);
+            const freq = omega / (2 * Math.PI);
+            const period = 1 / freq;
+
+            document.getElementById('mValDisplay').textContent = m.toFixed(1);
+            document.getElementById('kValDisplay').textContent = k.toFixed(1);
+            document.getElementById('ratioDisplay').textContent = C.toFixed(1);
             
-            const m = parseFloat(mSlider.value);
-            const k = parseFloat(kSlider.value);
-            const maxN = parseInt(nRange.value);
-            const omega = Math.sqrt(k/m);
-            const f = omega / (2 * Math.PI);
-            const T = 1 / f;
-
-            document.getElementById('mDisp').textContent = m.toFixed(1);
-            document.getElementById('kDisp').textContent = k.toFixed(1);
-            document.getElementById('omegaVal').textContent = omega.toFixed(2);
-            document.getElementById('fVal').textContent = f.toFixed(2);
-            document.getElementById('tVal').textContent = T.toFixed(2);
-            document.getElementById('ratioVal').textContent = (k/m).toFixed(1);
-
-            const centerY = canvas.height / 2;
-            const centerX = canvas.width / 2;
-
-            const amplitude = 40;
-            const currentY = centerY + amplitude * Math.cos(omega * time);
+            document.getElementById('liveFreq').textContent = freq.toFixed(2) + " Hz";
+            document.getElementById('livePeriod').textContent = period.toFixed(2) + " s";
             
-            ctx.beginPath();
-            ctx.strokeStyle = '#64748b';
-            ctx.lineWidth = 2;
-            ctx.moveTo(centerX - 100, 0);
-            for(let i=0; i<20; i++) {
-                ctx.lineTo(centerX - 100 + (i%2 ? 10 : -10), (currentY / 20) * i);
+            const liveMathEl = document.getElementById('liveMathPhys');
+            liveMathEl.innerHTML = `$$ \\omega_n = \\sqrt{\\frac{${k}}{${m}}} \\approx ${omega.toFixed(2)} \\, \\text{rad/s} $$`;
+            if (window.MathJax) MathJax.typesetPromise([liveMathEl]);
+        }
+
+        let labTime = 0;
+        function animatePhysics() {
+            if (!document.getElementById('physics').classList.contains('active')) {
+                requestAnimationFrame(animatePhysics);
+                return;
             }
-            ctx.stroke();
 
-            ctx.beginPath();
-            ctx.fillStyle = '#3b82f6';
-            const radius = 10 + (m * 8);
-            ctx.arc(centerX - 100, currentY, radius, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.strokeStyle = '#1e3a8a';
-            ctx.stroke();
-
-            const waveAreaX = centerX - 30;
-            const waveWidth = canvas.width - waveAreaX - 30;
+            labCtx.clearRect(0, 0, labCanvas.width, labCanvas.height);
+            const n = parseInt(nPhysSlider.value);
+            const m = parseFloat(mPhysSlider.value);
+            const k = parseFloat(kPhysSlider.value);
+            const C = k / m;
             
-            const nStep = Math.floor((time % 5) * (maxN / 5)) + 1;
-            const val = (nStep * nStep) - nStep + (k/m);
-            const isP = isPrime(Math.round(val));
+            const result = (n * n) - n + C;
+            const isP = isPrime(result);
 
-            ctx.beginPath();
-            ctx.strokeStyle = isP ? '#10b981' : '#ef4444';
-            ctx.lineWidth = isP ? 3 : 1.5;
+            document.getElementById('nPhysDisp').textContent = n;
             
-            for(let x=0; x<waveWidth; x++) {
-                const perc = x / waveWidth;
-                const env = Math.sin(nStep * Math.PI * perc);
-                const osc = Math.cos(omega * time);
-                const y = centerY + (amplitude * 1.5) * env * osc;
+            const omega = Math.sqrt(C); 
+            const centerY = labCanvas.height / 2;
+            const centerX = labCanvas.width / 2;
+            const amp = 40;
+            const currentY = centerY + amp * Math.cos(omega * labTime);
+
+            // Draw Mechanical System
+            labCtx.beginPath();
+            labCtx.strokeStyle = '#475569';
+            labCtx.lineWidth = 2;
+            labCtx.moveTo(centerX - 120, 0);
+            for(let i=0; i<=20; i++) {
+                labCtx.lineTo(centerX - 120 + (i%2 ? 10 : -10), (currentY / 20) * i);
+            }
+            labCtx.stroke();
+            labCtx.fillStyle = '#3b82f6';
+            // Size of mass scales with 'm'
+            const massRadius = 10 + (m * 2);
+            labCtx.beginPath(); labCtx.arc(centerX - 120, currentY, massRadius, 0, Math.PI*2); labCtx.fill();
+
+            // Draw Wave Pattern
+            const waveX = centerX - 40;
+            const waveW = labCanvas.width - waveX - 40;
+            
+            const resonanceThreshold = 0.01;
+            document.getElementById('stateLabel').textContent = isP ? `STABLE RESONANCE` : `WAVE INTERFERENCE`;
+            document.getElementById('stateLabel').className = isP ? 'text-emerald-400 font-bold' : 'text-red-400 font-bold';
+
+            labCtx.beginPath();
+            labCtx.strokeStyle = isP ? '#10b981' : '#ef4444';
+            labCtx.lineWidth = isP ? 3 : 1;
+            for(let x=0; x<waveW; x++) {
+                const p = x / waveW;
+                const harmonic = Math.sin(n * Math.PI * p);
+                const phase = Math.cos(omega * labTime);
+                let y = centerY + (amp * 1.5) * harmonic * phase;
                 
-                if(!isP && x % 5 === 0) {
-                    ctx.lineTo(waveAreaX + x, y + (Math.random() - 0.5) * 10);
-                } else {
-                    ctx.lineTo(waveAreaX + x, y);
+                if(!isP) {
+                    y += (Math.random()-0.5) * 15;
                 }
+                
+                if(x===0) labCtx.moveTo(waveX+x, y);
+                else labCtx.lineTo(waveX+x, y);
             }
-            ctx.stroke();
+            labCtx.stroke();
 
-            ctx.fillStyle = isP ? '#10b981' : '#ef4444';
-            ctx.font = 'bold 12px monospace';
-            ctx.fillText(`Step n=${nStep}`, waveAreaX, 40);
-            ctx.fillText(`Value=${val.toFixed(1)} (${isP ? 'PRIME' : 'COMPOSITE'})`, waveAreaX, 60);
-
-            time += 0.03;
-            requestAnimationFrame(animate);
+            labTime += 0.05;
+            requestAnimationFrame(animatePhysics);
         }
 
         window.onload = () => {
-            canvas.width = canvas.offsetWidth;
-            canvas.height = canvas.offsetHeight;
+            renderPreambleGraph();
             updateTable();
-            animate();
+            animatePhysics();
         };
 
-        document.getElementById('toggleCollapsed').addEventListener('click', () => {
-            showNonInteger = !showNonInteger;
-            document.getElementById('toggleCollapsed').textContent = showNonInteger ? 'Hide Non-Integer D' : 'Show Non-Integer D (1, 2)';
-            updateTable();
+        document.getElementById('preambleDSelector').addEventListener('change', renderPreambleGraph);
+        document.getElementById('nRange').addEventListener('input', updateTable);
+        
+        mPhysSlider.addEventListener('input', () => {
+            physCSelector.value = 'manual';
+            updatePhysMath();
+        });
+        kPhysSlider.addEventListener('input', () => {
+            physCSelector.value = 'manual';
+            updatePhysMath();
         });
 
-        document.getElementById('nRange').addEventListener('input', updateTable);
-        document.getElementById('preset163').addEventListener('click', () => {
-            mSlider.value = 1.0;
-            kSlider.value = 41;
+        document.getElementById('physCSelector').addEventListener('change', (e) => {
+            if (e.target.value !== 'manual') {
+                const val = parseFloat(e.target.value);
+                mPhysSlider.value = 1.0;
+                kPhysSlider.value = val;
+                updatePhysMath();
+            }
+        });
+
+        document.getElementById('toggleCollapsed').addEventListener('click', (e) => {
+            showNonInteger = !showNonInteger;
+            e.target.textContent = showNonInteger ? 'Hide D = 1, 2' : 'Show D = 1, 2';
+            updateTable();
         });
 
         window.onresize = () => {
-            canvas.width = canvas.offsetWidth;
-            canvas.height = canvas.offsetHeight;
+            renderPreambleGraph();
+            labCanvas.width = labCanvas.offsetWidth;
+            labCanvas.height = labCanvas.offsetHeight;
         };
     </script>
 </body>
