@@ -41,7 +41,7 @@
                    |___/                                                          
                 </div>
                 <p class="mt-4 text-lg font-medium text-slate-700 max-w-2xl">
-                    The 9 Magic Numbers of Class Number 1: Where Algebra ensures Prime Perfection.LeeMcCullochJames@
+                    The 9 Magic Numbers of Class Number 1: Where Algebra ensures Prime Perfection.
                 </p>
             </div>
         </header>
@@ -59,8 +59,8 @@
                 </button>
             </div>
             <div class="text-sm text-slate-500 border-l pl-6 border-slate-200">
-                <p>Heegner Prime Generator: \( f(n) = n^2 - n + 41 \)</p>
-                <p class="text-xs text-blue-600 italic">For \( D=163 \), primes persist for \( n=1..40 \)</p>
+                <p>Heegner Prime Generator: \( f(n) = n^2 - n + C \)</p>
+                <p class="text-xs text-blue-600 italic">For \( D=163 \), \( C=41 \) and primes persist for \( n=1..40 \)</p>
             </div>
         </div>
 
@@ -176,10 +176,11 @@
             const headerRow = document.getElementById('tableHeader');
             const tableBody = document.getElementById('tableBody');
             
+            // Fixed the header column to use ASCII (1+D)/4 for legibility
             headerRow.innerHTML = `
                 <th class="p-4 sticky left-0 bg-slate-100 z-30 min-w-[100px]">D</th>
-                <th class="p-4 sticky left-[100px] bg-slate-100 z-30 min-w-[140px]">\(C = \frac{1+D}{4}\)</th>
-                ${Array.from({length: maxN}, (_, i) => `<th class="p-2 text-center min-w-[60px]">\(n=${i+1}\)</th>`).join('')}
+                <th class="p-4 sticky left-[100px] bg-slate-100 z-30 min-w-[140px]">C = (1+D)/4</th>
+                ${Array.from({length: maxN}, (_, i) => `<th class="p-2 text-center min-w-[60px]">n=${i+1}</th>`).join('')}
             `;
 
             tableBody.innerHTML = '';
@@ -203,7 +204,6 @@
             if (window.MathJax) MathJax.typesetPromise();
         }
 
-        // PHYSICS & STANDING WAVE CANVAS
         const canvas = document.getElementById('oscCanvas');
         const ctx = canvas.getContext('2d');
         const mSlider = document.getElementById('mSlider');
@@ -231,11 +231,9 @@
             const centerY = canvas.height / 2;
             const centerX = canvas.width / 2;
 
-            // 1. Draw the Mass-Spring (Physical SHM)
             const amplitude = 40;
             const currentY = centerY + amplitude * Math.cos(omega * time);
             
-            // Draw Spring
             ctx.beginPath();
             ctx.strokeStyle = '#64748b';
             ctx.lineWidth = 2;
@@ -245,7 +243,6 @@
             }
             ctx.stroke();
 
-            // Draw Mass (Size grows with m)
             ctx.beginPath();
             ctx.fillStyle = '#3b82f6';
             const radius = 10 + (m * 8);
@@ -254,11 +251,9 @@
             ctx.strokeStyle = '#1e3a8a';
             ctx.stroke();
 
-            // 2. Draw Standing Waves (Harmonics mapping to Polynomial steps)
             const waveAreaX = centerX - 30;
             const waveWidth = canvas.width - waveAreaX - 30;
             
-            // Current n-step determined by time loop
             const nStep = Math.floor((time % 5) * (maxN / 5)) + 1;
             const val = (nStep * nStep) - nStep + (k/m);
             const isP = isPrime(Math.round(val));
@@ -269,13 +264,11 @@
             
             for(let x=0; x<waveWidth; x++) {
                 const perc = x / waveWidth;
-                // Standing wave equation: sin(n * pi * x) * cos(omega * t)
-                // We use nStep to show different harmonics
                 const env = Math.sin(nStep * Math.PI * perc);
                 const osc = Math.cos(omega * time);
                 const y = centerY + (amplitude * 1.5) * env * osc;
                 
-                if(!isP && x % 5 === 0) { // Add noise for composite numbers (broken symmetry)
+                if(!isP && x % 5 === 0) {
                     ctx.lineTo(waveAreaX + x, y + (Math.random() - 0.5) * 10);
                 } else {
                     ctx.lineTo(waveAreaX + x, y);
@@ -283,7 +276,6 @@
             }
             ctx.stroke();
 
-            // Labels for Standing Wave
             ctx.fillStyle = isP ? '#10b981' : '#ef4444';
             ctx.font = 'bold 12px monospace';
             ctx.fillText(`Step n=${nStep}`, waveAreaX, 40);
@@ -319,6 +311,7 @@
     </script>
 </body>
 </html>
+
 
 
 
